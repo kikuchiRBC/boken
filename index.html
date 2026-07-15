@@ -1,0 +1,2062 @@
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SSW Monster Hunter: Boss Rush</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+            
+ruby{
+    ruby-align:center;
+}
+
+button rt{
+    font-size:0.5em;
+    color:#ffffff;
+}
+
+rt{
+    font-size:0.55em;
+    color:#ffffff;
+}
+#sound-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.8rem;
+}
+
+/* モンスター浮遊アニメ */
+
+
+.float {
+    animation: float 2s ease-in-out infinite;
+}
+
+
+
+/* ダメージ */
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-5px, 0); }
+    50% { transform: translate(5px, 0); }
+    75% { transform: translate(-5px, 0); }
+    100% { transform: translate(0, 0); }
+}
+#monster-wrapper {
+    display: inline-block;
+}
+
+#monster-img {
+    height: 180px;
+}
+.win-image{
+    width:200px;
+    display:block;
+    margin:20px auto;
+}
+
+
+/* これそのままでOK */
+
+#message-window{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    height:auto;
+    min-height:120px;
+}
+
+#title-area{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+#title-image{
+    max-width:100%;
+    width:500px;
+    height:auto;
+}
+
+#text{
+    flex:1;
+}
+
+#question-image-area{
+    flex-shrink:0;
+}
+
+#question-image{
+    height:120px;
+    max-height:120px;
+    width:auto;
+    border:2px solid #fff;
+    border-radius:10px;
+}
+
+.crossKey{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+}
+
+.crossKey .row{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+}
+
+.arrowBtn{
+    width:70px;
+    height:70px;
+    border:none;
+    border-radius:18px;
+
+    background:linear-gradient(180deg,#666,#333);
+    color:white;
+
+    font-size:32px;
+    font-weight:bold;
+
+    box-shadow:
+        0 5px 0 #222,
+        0 8px 15px rgba(0,0,0,.4);
+
+    cursor:pointer;
+    transition:.15s;
+}
+
+.arrowBtn:hover{
+    background:linear-gradient(180deg,#888,#444);
+    transform:translateY(-2px);
+}
+
+.arrowBtn:active{
+    transform:translateY(4px);
+    box-shadow:
+        0 1px 0 #222;
+}
+@keyframes float {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+
+            body { background: #0078cd; color: #fff; font-family: 'DotGothic16', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+            #game-container { width: 450px; background: #000; border: 4px solid #fff; padding: 20px; position: relative; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+            .stats { display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 10px; border-bottom: 2px solid #fff; padding-bottom: 5px; }
+#monster-area { height: 200px;display: flex;justify-content: center;align-items: center;margin-bottom: 15px;position: relative;overflow: hidden; background-size: cover;background-position: center;background-repeat: no-repeat;
+}
+            .monster-fade-in { animation: slideIn 0.5s ease-out; }
+            @keyframes slideIn { from { transform: translateY(-200px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            #message-window { height: 80px; border: 2px solid #fff; padding: 10px; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.4; background: rgba(255,255,255,0.05); }
+            .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            button { background: #000; color: #fff; border: 2px solid #fff; padding: 10px; font-family: 'DotGothic16', sans-serif; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+            button:hover { background: #fff; color: #000; }
+            #game-container { background-size: cover;background-position: center;}
+            
+#area-name {
+    position: absolute;
+    top: 10px;     /* ←ここをbottom → topに変更 */
+    right: 10px;   /* ←右はそのまま */
+    font-size: 1rem;
+    color: #ff0;
+    background: rgba(0,0,0,1);
+    padding: 5px 10px;
+    border: 1px solid #fff;
+}
+
+#monster-area {
+    position: relative;
+}
+
+/* 攻撃フラッシュ */
+#hit-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* アニメーション */
+.hit {
+    animation: flash 0.3s;
+}
+
+@keyframes flash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}/* ========= スマホ対応 ========= */
+@media screen and (max-width:768px){
+
+    body{
+        padding:10px;
+        height:auto;
+        min-height:100vh;
+    }
+
+    #game-container{
+        width:95%;
+        padding:10px;
+        box-sizing:border-box;
+    }
+
+    .stats{
+        font-size:0.9rem;
+        flex-wrap:wrap;
+        gap:5px;
+    }
+
+    #monster-area{
+        height:150px;
+    }
+
+    #monster-img{
+        max-width:100%;
+        height:130px;
+    }
+    #win-img{
+        
+        max-width:100%;
+        height:200px;}
+
+    #message-window{
+        height:auto;
+        min-height:100px;
+        font-size:0.9rem;
+    }
+
+    .options-grid{
+        grid-template-columns:1fr;
+    }
+
+    button{
+        width:100%;
+        font-size:0.9rem;
+        padding:12px;
+    }
+
+    #sound-toggle{
+        position:fixed;
+        top:5px;
+        left:5px;
+        z-index:999;
+        font-size:0.7rem;
+        width:auto;
+    }
+
+    #area-name{
+        font-size:0.8rem;
+        padding:4px 8px;
+    }
+}
+
+/* 小型スマホ */
+@media screen and (max-width:480px){
+
+    .stats{
+        font-size:0.8rem;
+    }
+
+    #monster-area{
+        height:120px;
+    }
+    #win-img{        height:100px;
+    }
+    #monster-img{
+        height:100px;
+    }
+
+    #message-window{
+        font-size:0.8rem;
+    }
+
+    button{
+        font-size:0.8rem;
+    }
+}
+    #titleScreen{
+    width:100%;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    background:
+    linear-gradient(#001f3f,#003366);
+
+    color:white;
+}
+
+#titleScreen h1{
+    font-size:50px;
+    margin-bottom:30px;
+    text-shadow:3px 3px 5px black;
+}
+
+#titleScreen button{
+    width:250px;
+    height:70px;
+    font-size:24px;
+}
+
+canvas{
+    border:2px solid white;
+    max-width:100%;
+    margin-top:10px;
+}
+
+.controls{
+    margin-top:20px;
+}
+
+.row{
+    display:flex;
+    justify-content:center;
+}
+
+
+
+
+.controller{
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    margin-top:20px;
+}
+
+.actionButtons{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.okBtn{
+    width:100px;
+    height:60px;
+    background:#2ecc71;
+    color:white;
+    font-size:20px;
+    border:none;
+    border-radius:12px;
+}
+
+.cancelBtn{
+    width:100px;
+    height:60px;
+    background:#e74c3c;
+    color:white;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+}
+#statusBar{
+
+    width:640px;
+    max-width:100%;
+
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+
+    background:#222;
+
+    border:2px solid white;
+
+    padding:10px 0;
+
+    margin-top:10px;
+}
+
+.statusItem{
+
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    color:white;
+    font-size:20px;
+}
+
+.icon{
+
+    width:32px;
+    height:32px;
+}
+        </style>
+    </head>
+    <body>
+        <div class="controller">
+
+    <div class="crossKey">
+        <div class="row">
+            <button class="arrowBtn" onclick="movePlayer(0,-1)">↑</button>
+        </div>
+
+        <div class="row">
+            <button class="arrowBtn" onclick="movePlayer(-1,0)">←</button>
+            <button class="arrowBtn" onclick="movePlayer(1,0)">→</button>
+        </div>
+
+        <div class="row">
+            <button class="arrowBtn" onclick="movePlayer(0,1)">↓</button>
+        </div>
+    </div>
+<div id="titleScreen">
+    <h1>なかよし海の冒険団</h1>
+    <button onclick="startGametitle()">ゲームスタート</button>
+</div>
+
+<div id="field-screen" style="display:none;">
+
+<canvas id="field" width="400" height="400"></canvas>
+
+</div>
+
+
+<!-- ここに追加 -->
+<div id="event-screen" style="display:none;">
+
+    <div id="question-image-area">
+        <img id="event-image" style="max-height:200px;">
+    </div>
+
+    <div id="message-window">
+        <div id="event-text">
+        </div>
+    </div>
+
+</div>
+
+
+
+
+    <div id="game-container" style="display:none;">
+        <div class="stats">
+            <span>LV: <span id="lv">1</span></span>
+            <span>HP: <span id="hp">100</span></span>
+            <span>EXP: <span id="exp">0</span></span>
+        </div>
+        
+
+<div id="monster-area">
+    <div id="hit-effect"></div> 
+    
+
+<div id="monster-wrapper" class="float">
+    <img id="monster-img" src="start.jpg">
+</div>
+
+
+    <div id="area-name"></div>  <!-- ←ここに入れる -->
+</div>
+
+
+<div id="message-window">
+        
+
+    <div id="question-image-area">
+    <img id="question-image" style="display:none;">
+</div>
+    <div id="text">
+      冒険が始まる！ <br>ジャンルを選んでください<br>
+        Select your genre
+    </div>
+</div>
+
+<div class="options-grid" id="options">
+    <button onclick="startGame('N3')"><ruby>飲食料品製造業<rt>いんしょくりょうひんせいぞうぎょう</rt></ruby></button>
+    <button onclick="startGame('N2')"><ruby>介護<rt>かいご</rt></ruby></button>
+    <button onclick="startGame('N1')"><ruby>宿泊<rt>しゅくはく</rt></ruby></button>
+    <button onclick="startGame('N4')">ビルクリーニング</button>
+</div>
+
+
+    </div>
+
+
+    <div class="actionButtons">
+        <button class="okBtn" onclick="pressOK()">
+            OK
+        </button>
+
+        <button class="cancelBtn" onclick="regenerateMap()">
+            MAPreload
+        </button>
+    </div>
+
+</div>
+
+<button id="sound-toggle" onclick="toggleSound()">🔊 SOUND ON</button>
+<audio id="se-heal">
+    <source src="se_kaihuku02.mp3" type="audio/mpeg">
+</audio>
+
+    <audio id="bgm-ending" loop>
+        <source src="ending.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="bgm" loop>
+        <source src="maou_bgm_8bit27.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="se-hit">
+        <source src="se1.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="se-damage">
+        <source src="se2.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="se-levelup">
+        <source src="se_levelup.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="bgm-boss" loop>
+        <source src="lastboss.mp3" type="audio/mpeg">
+    </audio>
+
+
+    <audio id="bgm-field" loop>
+        <source src="field.mp3" type="audio/mpeg">
+    </audio>
+
+
+
+    <script>
+        
+        let battleWin = false;
+    let isSoundOn = true;
+    let eventDone = {};
+    const endingBgm = document.getElementById("bgm-ending");
+    const seHit = document.getElementById("se-hit");
+    const seDamage = document.getElementById("se-damage");
+    const seLevel = document.getElementById("se-levelup");
+    const bossBgm = document.getElementById("bgm-boss");
+    const seHeal = document.getElementById("se-heal");
+    const monsters1 = ["kurage.png","kani.png","kame.png"];
+    const monsters2 = ["fugu.png", "tako.png","manta.png"];
+    const monsters3 = ["oumugai.png", "utsubo.png","shark.png","fugu.png"];
+    const monsters4 = ["umiushi.png", "majisyan.png","dragon.png","dragon2.png"];
+
+const fieldBgm = document.getElementById("bgm-field");
+const battleBgm = document.getElementById("bgm");
+
+const monsterArea =
+document.getElementById("monster-area");
+
+        // モンスターの画像リスト
+        const monsterImages = [
+            "oni.png", // 鬼
+            "dragon2.png", // ドラゴン風
+            "slime-c.png", // スライム風）
+            "night.png" , // 騎士風
+            "monnene.jpg" , // モンエネ）
+            "moruboru.png","flame.png","koumori.png","nezumi.png",
+            "mimic.png","ldog.png","majisyan.png","dragon.png","slime-c2.png","kidsdragon.png"
+        ];
+   
+function startGame(category) {
+
+    document.getElementById("title-area").style.display = "none";
+
+    // 既存の処理
+}
+     
+
+let eventMode = false;
+let eventMessages = [];
+let eventIndex = 0;
+let joinFriend = null
+
+let startBossAfterEvent = false;
+    // イベント
+function startEvent(messages, friend=null){
+
+    eventMode = true;
+
+    eventMessages = messages;
+    eventIndex = 0;
+
+    joinFriend = friend;
+
+    document.getElementById("field-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+
+    document.getElementById("options").style.display = "none";
+
+    showEventMessage();
+}
+function showEventMessage(){
+
+    const msg = eventMessages[eventIndex];
+
+    document.getElementById("monster-img").src = msg.img;
+
+    document.getElementById("text").innerHTML =
+        msg.text;
+}
+
+function closeEvent(){
+
+    eventMode = false;
+
+    if(joinFriend && party.length < friendSets.length){
+
+        party.push({
+            x: player.x,
+            y: player.y
+        });
+
+        joinFriend = null;
+    }
+
+    // 最終イベント後ならボス戦
+    if(startBossAfterEvent){
+
+        startBossAfterEvent = false;
+
+        bossBattle = true;
+        bossStreak = 0;
+
+        document.getElementById("field-screen").style.display = "none";
+        document.getElementById("game-container").style.display = "block";
+
+        changeMonster();
+
+        document.getElementById("text").innerHTML =
+        "★★★★ ガーディアン出現！ ★★★★<br>5問連続正解で勝利！";
+
+     
+document.getElementById("options").style.display = "grid";
+
+    changeMonster();
+
+    loadQuestion();
+
+    return;
+
+    }
+
+    document.getElementById("options").style.display = "grid";
+
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("field-screen").style.display = "block";
+draw();
+
+
+}
+
+function triggerAreaEvent(){
+
+    // 同じイベントを何回も出さない
+    if(eventDone[currentMapIndex]) return;
+
+    switch(currentMapIndex){
+
+        case 6:
+
+            eventDone[currentMapIndex] = true;
+
+            startEvent([
+                {
+                    img:"img/otter.png",
+                    text:"カワウソ：ねえねえ。どこにいくの？"
+                },
+                      {
+                    img:"img/penguin.png",
+                    text:"ペンギン：伝説のさかなを探す旅をしているんだ"
+                },
+                {
+                    img:"img/otter.png",
+                    text:"カワウソ：へー！面白そうだからぼくも連れて行ってよ。"
+                },
+
+                        {
+                    img:"img/penguin.png",
+                    text:"ペンギン：いいよ！それじゃあいっしょにいこうか！"
+                },
+                    　 {
+                    img:"img/otter.png",
+                    text:"ペンギン・カワウソ：おー！"
+                },
+            {
+                img:"img/otterpenguin.png",
+                    text:"♪カワウソが仲間になった！"
+                    }
+            ],"otter");
+
+            break;
+
+        case 12:
+
+            eventDone[currentMapIndex] = true;
+
+            startEvent([
+                {
+                    img:"img/otter.png",
+                    text:"カワウソ：うーん、なんだかおなかがすいたなぁ"
+                },
+                {
+                    img:"img/orca.png",
+                    text:"シャチ：こんなところでどうしたの？"
+                },
+                 {
+                    img:"img/penguin.png",
+                    text:"ペンギン：こんにちは。ぼくはペンギン。"
+                },
+                 {
+                    img:"img/penguin.png",
+                    text:"ペンギン：伝説のさかなをさがしているんだ。"
+                },
+                  {
+                    img:"img/penguin.png",
+                    text:"ペンギン：でも、おなかがすいちゃって"
+                },
+                   {
+                    img:"img/orca.png",
+                    text:"シャチ：そうなんだ！よかったらこれたべる？"
+                },
+                   {
+                    img:"img/penguin.png",
+                    text:"ペンギン：え！いいの？"
+                },
+                  {
+                    img:"img/otter.png",
+                    text:"カワウソ：すごくおいしそう！"
+                },
+                 {
+                    img:"img/orca.png",
+                    text:"シャチ：ぜひたべてみて！とってもおいしいから"
+                }  ,
+
+    {
+    img:"img/dolphin.png",
+    text:"♪シャチが仲間になった！"
+    }
+            ],"orca");
+
+            break;
+
+        case 18:
+
+            eventDone[currentMapIndex] = true;
+startEvent([
+
+{
+    img:"img/dolphin.png",
+    text:"？？？：やあ！君たち、どこへ行くんだい？"
+},
+
+{
+    img:"img/penguin.png",
+    text:"ペンギン<：ぼくたちは伝説のさかなを探す旅をしているんだ！"
+},
+
+{
+    img:"img/otter.png",
+    text:"カワウソ：世界のどこかにいるって言われているんだよ。"
+},
+
+{
+    img:"img/dolphin.png",
+    text:"イルカ：伝説のさかな！？<br>それは面白そうだね！"
+},
+
+{
+    img:"img/orca.png",
+    text:"シャチ：見つけたらどんな願いもかなうって話なんだ！"
+},
+
+{
+    img:"img/dolphin.png",
+    text:"イルカ：実はぼくもそのうわさを聞いたことがあるよ。"
+},
+
+{
+    img:"img/dolphin.png",
+    text:"イルカ：ひとりで探していたんだけど、なかなか見つからなくてさ。"
+},
+
+{
+    img:"img/penguin.png",
+    text:"ペンギン：じゃあ、一緒に探さない？"
+},
+
+{
+    img:"img/otter.png",
+    text:"カワウソ：仲間が増えたほうがきっと楽しいよ！"
+},
+
+{
+    img:"img/dolphin.png",
+    text:"イルカ：本当かい！？<br>ぜひ仲間にしてほしい！"
+},
+
+{
+    img:"img/orca.png",
+    text:"シャチ：もちろんだ！"
+},
+
+{
+    img:"img/dolphin.png",
+    text:"イルカ：よーし！<br>みんなで伝説のさかなを見つけよう！"
+},
+
+{
+    img:"img/dolphin.pngd",
+    text:"♪イルカが仲間になった！"
+}
+
+],"dolphin");
+            break;
+
+
+case 30:
+
+    eventDone[currentMapIndex] = true;
+
+    startBossAfterEvent = true;
+
+    startEvent([
+
+        {
+            img:"guardian.png",
+            text:"ガーディアン：伝説のさかなを守る者だ。"
+        },
+
+        {
+            img:"guardian.png",
+            text:"この先へ進みたければ私を倒してみろ！"
+        }
+
+    ]);
+
+    break;
+    }
+}
+
+function startGame(level) {
+
+fieldBgm.pause();
+
+battleBgm.currentTime = 0;
+battleBgm.play();
+
+    inBattle = true;
+
+    document.getElementById("field-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+
+
+ currentLevel = level;
+
+    document.getElementById("text").innerHTML =
+    "モンスターが現れた！<br>問題に答えろ！";
+
+    changeMonster();
+
+    updateMonsterBackground();
+
+  loadQuestion();
+}
+
+function toggleSound() {
+    isSoundOn = !isSoundOn;
+
+    const btn = document.getElementById("sound-toggle");
+
+    if (isSoundOn) {
+        btn.innerText = "🔊 SOUND ON";
+fieldBgm.muted = false;
+        audio.muted = false;
+        bossBgm.muted = false;
+        endingBgm.muted = false;
+
+        seHit.muted = false;
+        seDamage.muted = false;
+        seLevel.muted = false;
+        seHeal.muted = false;
+
+    } else {
+        btn.innerText = "🔇 SOUND OFF";
+fieldBgm.muted = true;
+        audio.muted = true;
+        bossBgm.muted = true;
+        endingBgm.muted = true;
+
+        seHit.muted = true;
+        seDamage.muted = true;
+        seLevel.muted = true;
+        seHeal.muted = true;
+    }
+}
+
+function shakeMonster() {
+    monsterImg.classList.remove("shake");
+    void monsterImg.offsetWidth;
+    monsterImg.classList.add("shake");
+}
+
+function updateMonsterBackground() {
+
+    if(bossBattle){
+
+        monsterArea.style.backgroundImage =
+        "url('bg_boss.jpg')";
+        return;
+    }
+
+    if(currentMapIndex < 6){
+
+        monsterArea.style.backgroundImage =
+        "url('bg_forest.jpg')";
+    }
+    else if(currentMapIndex < 12){
+
+        monsterArea.style.backgroundImage =
+        "url('bg_cave.jpg')";
+    }
+    else if(currentMapIndex < 18){
+
+        monsterArea.style.backgroundImage =
+        "url('bg1-1.jpg')";
+    }
+    else if(currentMapIndex < 24){
+
+        monsterArea.style.backgroundImage =
+        "url('bg_snow.jpg')";
+    }
+    else{
+
+        monsterArea.style.backgroundImage =
+        "url('bg_demon.jpg')";
+    }
+}
+const hitEffect = document.getElementById("hit-effect");
+
+function playHitEffect() {
+    hitEffect.classList.remove("hit");
+    void hitEffect.offsetWidth; // リセット
+    hitEffect.classList.add("hit");
+}
+
+   
+     const questions2  = [
+    
+{ q: "子どもと公園で＜あそび＞ました。", a: "遊び", ops: ["逃び", "述び", "運び", "遊び"] },
+{ q: "事故にあった男性は＜じゅうたい＞だそうだ。", a: "重体", ops: ["十代", "重犬", "重体", "十体"] },
+{ q: "今、外にいるんです。＜きたく＞したら、もう一度電話します。", a: "帰宅", ops: ["帰家", "着家", "帰宅", "着宅"] },
+{ q: "＜つめたい＞ジュースを飲んだ。", a: "冷たい", ops: ["冷たい", "凍たい", "寒たい", "涼たい"] },
+{ q: "風邪のときは睡眠と＜えいよう＞をしっかりとってくださいね。", a: "栄養", ops: ["体調", "休養", "栄養", "治療"] },
+{ q: "世界中の人がこのニュースに＜かんしん＞を持っている。", a: "関心", ops: ["関心", "感心", "完心", "観心"] },
+{ q: "工場見学をご（　　　）の方は、私にお知らせください。", a: "希望", ops: ["興味", "期待", "確認", "希望"] },
+{ q: "息子の進学のために、毎月（　　　）している。", a: "貯金", ops: ["貯金", "税金", "現金", "代金"] },
+{ q: "運動（　　　）なので、ジョギングを始めます。", a: "不足", ops: ["不安", "不足", "不良", "不満"] },
+{ q: "昨日、何もしないで早く寝たので、（　　　）元気になった。", a: "すっかり", ops: ["すっかり", "ぐっすり", "はっきり", "ぴったり"] },
+{ q: "新井さんに花の（　　　　）をたくさんもらいました。", a: "種", ops: ["林", "種", "草", "葉"] },
+{ q: "昨日のテストの（　　　）が心配だ。", a: "結果", ops: ["研究", "検査", "調査", "結果"] },
+{ q: "去年の旅行では（　　　）が多くて大変でした。", a: "トラブル", ops: ["ドリブル", "トラブル", "サポート", "サイクル"] },
+{ q: "階段を降りるときに（　　　）らしく、足が痛い。", a: "ひねった", ops: ["ひねった", "ほった", "なでた", "しばった"] },
+{ q: "私の上司は仕事をしながら（　　　）ばかり言っている。", a: "文句", ops: ["会話", "電話", "文句", "笑顔"] },
+{ q: "試合で負けて、とても（　　　）。", a: "くやしい", ops: ["はげしい", "くやしい", "あやしい", "むずかしい"] },
+{ q: "昨日の自動車事故の（　　　）は、エンジンの故障らしい。", a: "原因", ops: ["理解", "説明", "原因", "様子"] },
+{ q: "人気商品だから、売り切れない（　　　）早めに買っておこう。", a: "うちに", ops: ["あいだに", "うちに", "かぎり", "かわりに"] },
+{ q: "エアコンを買い替え（　　　）、1か月の電気代が1500円も安くなった。", a: "たところ", ops: ["たところ", "たてで", "たって", "たばかりの"] },
+{ q: "ミカンは昔から日本にある言葉な（　　　）、なんでカタカナで書くの？", a: "のに", ops: ["から", "ために", "にしては", "のに"] },
+{ q: "この子を助ける（　　　）なら、いくらでも払います。", a: "ため", ops: ["べき", "はず", "ため", "せい"] },
+{ q: "ストーブが（　　　）だったそうよ。", a: "つけっぱなし", ops: ["つけてある", "つけっぱなし", "つけている", "つけておく"] },
+{ q: "いえ、熱（　　　）下がれば、行けると思います。", a: "さえ", ops: ["こそ", "を", "さえ", "も"] },
+{ q: "家庭料理ですが、どうぞ（　　　）。", a: "召し上がってください", ops: ["食べなさい", "いただいてください", "召し上がってください", "お食べになられて"] },
+{ q: "スキー場は外国人（　　　）で、日本じゃないみたいだったよ。", a: "ばかり", ops: ["ばかり", "ほど", "にかぎらず", "をめぐって"] },
+{ q: "テーブルの上に置い（　　　）お弁当、持った？", a: "ておいた", ops: ["て", "てくる", "ている", "ておいた"] },
+{ q: "タバコをやめる（　　　）。", a: "ように言われた", ops: ["ようになっている", "ように感じる", "と言われた", "ように言われた"] },
+{ q: "先生なら黒板の字はもっと大きく（　　　）。", a: "書いてほしいね", ops: ["書いてほしいね", "書くことにするね", "書いてくれないね", "書くわけにはいかないね"] },
+{ q: "コンピューターの会社に＜転職＞します。", a: "てんしょく", ops: ["てんしょく", "てんきん", "しゅうしょく", "しゅうぎょう"] },
+{ q: "今日の＜晩＞ごはんは何にしようか。", a: "ばん", ops: ["よる", "ばん", "ゆう", "ひる"] },
+{ q: "このレストランは夜おそくまで＜営業＞している。", a: "えいぎょう", ops: ["かいぎょう", "えいぎょう", "へいぎょう", "こうぎょう"] },
+{ q: "駅に行くにはこちらの方が＜近道＞ですよ。", a: "ちかみち", ops: ["きんどう", "ちかどう", "きんみち", "ちかみち"] },
+{ q: "彼の長年の努力がやっと世間の人々に＜認め＞られた。", a: "みとめ", ops: ["たしかめ", "ほめ", "みとめ", "もとめ"] },
+{ q: "プラスチックの＜原料＞は石油だ。", a: "げんりょう", ops: ["げんちょう", "ざいりょう", "げんりょう", "ちんりょう"] },
+{ q: "道路が＜渋滞＞していたので遅刻してしまった。", a: "じゅうたい", ops: ["じゅんたい", "じゅうたい", "じゅたい", "じゅうだい"] },
+{ q: "その＜調子＞でがんばりましょう。", a: "ちょうし", ops: ["ちょこ", "ちょし", "ちょうこ", "ちょうし"] },
+{ q: "夫は毎週水曜日に中国文学の研究会に＜かよって＞います。", a: "通って", ops: ["通って", "走って", "使って", "待って"] },
+  { q: "＜きかい＞があったら、いっしょに食事をしましょう。", a: "機会", ops: ["機害", "機外", "機会", "機械"] },
+  { q: "私は勉強中、よく＜あまい＞ものを食べます。", a: "甘い", ops: ["塩い", "苦い", "辛い", "甘い"] },
+  { q: "祖父から家や土地を＜そうぞく＞したけど、その方法は簡単ではなかった。", a: "相続", ops: ["送族", "後続", "相族", "相続"] },
+  { q: "電車がプラットホームに＜つきました＞。", a: "着きました", ops: ["帰きました", "着きました", "届きました", "留きました"] },
+  { q: "戦争のせいであの国の＜けいざい＞は悪化している。", a: "経済", ops: ["経財", "経済", "経在", "経材"] },
+
+  { q: "今回新しくできたワクチンの（　）作用が初めて確認された。", a: "副", ops: ["不", "悪", "反", "副"] },
+  { q: "私たちのクラスは女の子がたくさんいて、男の子は（　）です。", a: "少ない", ops: ["強い", "新しい", "少ない", "古い"] },
+  { q: "山田さんの部屋（　）山が見えます。", a: "から", ops: ["で", "に", "へ", "から"] },
+  { q: "専門家が新しいコンピューターウイルスの（　）を警告しています。", a: "流行", ops: ["発達", "成長", "進歩", "流行"] },
+  { q: "お母さんの（　）にならないようにしなさい。", a: "じゃま", ops: ["たのしみ", "べんり", "じゃま", "ひま"] },
+  { q: "最もいい（　）を示した会社に仕事をお願いします。", a: "条件", ops: ["要件", "一件", "事件", "条件"] },
+  { q: "お湯が（　）いる音がするね。", a: "わいて", ops: ["わいて", "きえて", "おとして", "だして"] },
+  { q: "誕生日のパーティーに（　）された。", a: "招待", ops: ["紹介", "勉強", "招待", "挨拶"] },
+  { q: "彼女はスピーチで事の重大さを何度も（　）した。", a: "強調", ops: ["強力", "強調", "好調", "協調"] },
+  { q: "何かいいアイデアを思い（　）、すぐに紙に書くようにしています。", a: "ついたら", ops: ["はじめたら", "だしたら", "ついたら", "こんだら"] },
+  { q: "開店準備のため内装が予想以上にきれいに（　）。", a: "しあがった", ops: ["しあげた", "しあがった", "しこんだ", "しこめた"] },
+  { q: "消極的な人は気が弱い性格だと誤解されやすい。", a: "しょうきょくてき", ops: ["せいげき", "せいけき", "しょきょく", "しょうきょく"] },
+
+  { q: "その自動車事故の原因は「ながら運転」だという（　）に達した。", a: "結論", ops: ["結論", "結局", "結果", "結構"] },
+  { q: "スポーツは毎日（　）することが大事です。", a: "練習", ops: ["練習", "出席", "予定", "予習"] },
+  { q: "この運動靴は軽くて（　）やすいです。", a: "はき", ops: ["つけ", "かけ", "き", "はき"] },
+  { q: "健康のために（　）食べたほうがいいです。", a: "ほどほどに", ops: ["それから", "あまり", "ちょうど", "ほどほどに"] },
+  { q: "この料理を作るとき、野菜と肉、どちらを先に（　）ますか。", a: "炒め", ops: ["食べ", "燃え", "断り", "炒め"] },
+  { q: "天気がいいと、ここからスカイツリーが（　）見えます。", a: "はっきり", ops: ["ぐっすり", "はっきり", "ぴったり", "たっぷり"] },
+  { q: "昨日の発表は（　）できた。", a: "うまく", ops: ["うまく", "くさく", "激しく", "わるく"] },
+  { q: "夫は旅（　）のトルコから珍しいスカーフを買ってきてくれました。", a: "先", ops: ["手", "外", "先", "地"] },
+  { q: "彼は長年かけてむすこをオリンピック選手に育て（　）。", a: "上げた", ops: ["回った", "受けた", "上げた", "みた"] },
+  { q: "そんなに（　）時間でこの宿題を終わらせることはできません。", a: "短い", ops: ["厳しい", "親しい", "短い", "長い"] },
+  { q: "６時くらいから雨が降るそうだから、かさの（　）をしていったほうがいいと思うよ。", a: "用意", ops: ["用途", "用事", "用件", "用意"] },
+
+  { q: "ちょっと＜いねむり＞しているうちに、降りる駅を行き過ぎてしまった。", a: "居眠り", ops: ["昼眠り", "居眠り", "昼寝り", "居寝り"] },
+  { q: "この高校は部活動が＜さかんな＞ことで有名です。", a: "盛んな", ops: ["豊んな", "盛んな", "勢んな", "強んな"] },
+  { q: "田舎から＜とどいた＞荷物には野菜が入っていた。", a: "届いた", ops: ["着いた", "帰いた", "止いた", "届いた"] },
+  { q: "寒い冬にはやっぱり＜あたたかい＞お茶が一番だ。", a: "温かい", ops: ["暖かい", "温かい", "暑かい", "熱かい"] },
+  { q: "天気予報によると今日は＜さいてい＞気温がマイナス4度まで下がる。", a: "最低", ops: ["最低", "切体", "切低", "最体"] },
+  { q: "長い間準備した試験に不合格になって涙を＜ながした＞。", a: "流した", ops: ["出した", "長した", "流した", "戻した"] },
+  
+  { q: "彼女はその手紙を＜こっそり＞かばんにしまった。", a: "見られないように", ops: ["とられないように", "見られないように", "なくさないように", "忘れないように"] },
+  { q: "昨日の飲み会は本当に＜くだらなかった＞。", a: "つまらなかった", ops: ["たのしかった", "しずかだった", "つまらなかった", "にぎやかだった"] },
+  { q: "彼は＜利口な＞人です。", a: "頭がよい", ops: ["金持ちな", "頭がよい", "自分のことだけを考える", "あまり話さない"] },
+  { q: "来週までに1万字のレポートなんて、本当に＜きつい＞です。", a: "大変だ", ops: ["大変だ", "大事だ", "危険だ", "簡単だ"] },
+  { q: "彼女は歩くのが＜のろい＞。", a: "おそい", ops: ["おそい", "はやい", "すきだ", "きらいだ"] },
+
+  { q: "私は人づきあいが苦手なので＜会合＞などは夫に行ってもらいます。", a: "かいごう", ops: ["かいごう", "かいあい", "あいごう", "あいあい"] },
+  { q: "先生の言ったことが全部＜正しい＞とは言えない。", a: "ただしい", ops: ["さびしい", "かなしい", "ただしい", "おいしい"] },
+  { q: "彼女はかがみに＜映る＞自分を見てびっくりした。", a: "うつる", ops: ["ひかる", "てる", "はる", "うつる"] },
+  { q: "結果も大切だけど＜努力＞したことに意味があるんだよ。", a: "どりょく", ops: ["どうりょく", "どりょく", "きょうりょく", "きょりょく"] },
+  { q: "藤本さんは10年前からソウルで＜暮らして＞います。", a: "くらして", ops: ["くらして", "よらして", "あらして", "もらして"] },
+  { q: "元の書類とその翻訳を＜比べて＞みたら、いくつか間違った表現を見つけた。", a: "くらべて", ops: ["のべて", "すべて", "ならべて", "くらべて"] },
+  { q: "横断歩道を渡ろうとしたら、＜信号＞が赤に変わった。", a: "しんごう", ops: ["しんこう", "しんごう", "しんこ", "しんご"] },
+  { q: "ドルに＜両替＞するため銀行に行ってきます。", a: "りょうがえ", ops: ["りょうかえ", "りょうたい", "りょうがえ", "りょうだい"] },
+
+  { q: "彼は、会社で仕事も（　）スマホばかり見ている。", a: "せずに", ops: ["しても", "せずに", "しなくても", "しようと"] },
+  { q: "私はきゅうりが大嫌いなのに、無理やり友達に（　）。", a: "食べさせられた", ops: ["食べかけられた", "食べさせられた", "食べられた", "食べさせた"] },
+  { q: "きみ、不要なものがないか、箱の中身を確認して（　）かな。", a: "くれない", ops: ["いただかない", "もらわない", "まいらない", "くれない"] },
+  { q: "発表の順番が近づく（　）、緊張してきた。", a: "につれて", ops: ["をはじめ", "につれて", "をとおして", "になって"] },
+  { q: "昨日送った会議の資料は（　）。", a: "ご覧になりましたか", ops: ["ご覧になりましたか", "拝見しましたか", "見てくれませんか", "ご覧くださいませんか"] },
+  { q: "引っ越した（　）のころは、新しい学校に慣れるのに大変でした。", a: "ばかり", ops: ["ところ", "しばらく", "だけ", "ばかり"] },
+  { q: "少々（　）ください。", a: "お待ち", ops: ["待たれて", "お待ち", "お待ちして", "お待たせ"] },
+  { q: "次に人気があるの（　）がまんした。", a: "で", ops: ["も", "に", "で", "を"] },
+    { q: "留学は楽しいこと（　　　）ではない。", a: "ばかり", ops: ["ばかり", "だけ", "ほど", "くらい"] },
+    { q: "仕事に慣れる（　　　）、笑顔でお客様と話せるようになってきた。", a: "にしたがって", ops: ["にしたがって", "あいだに", "ところで", "あとで"] },
+    { q: "三日間降り続けた雨が（　　　）やんだ。", a: "ようやく", ops: ["ようやく", "とつぜん", "すでに", "まもなく"] },
+    { q: "インターネットで買い物をするのは、便利（　　　）怖いこともある。", a: "である一方で", ops: ["である一方で", "なので", "だから", "なら"] },
+    { q: "赤ちゃんは何でも口に（　　　）たがる。", a: "入れ", ops: ["入れ", "出し", "触れ", "取り"] },
+    { q: "ごめんね。約束の時間に（　　　）。", a: "間に合いそうになくて", ops: ["間に合いそうになくて", "間に合ったので", "間に合いながら", "間に合うけれど"] },
+    { q: "危険！池に（　　　）。", a: "入るな", ops: ["入るな", "入ろう", "入れる", "入った"] },
+    { q: "気に入ったものはつい（　　　）。", a: "買ってしまう", ops: ["買ってしまう", "買っている", "買っていた", "買わせる"] },
+    { q: "よく同じ猫が来る。今日（　　　）2回見た。", a: "だけでも", ops: ["だけでも", "しか", "だけ", "ばかり"] },
+    { q: "今日は晴れると言っていたので、傘を（　　　）出かけた。", a: "持たないで", ops: ["持たないで", "持つので", "持ちながら", "持とうと"] },
+    { q: "受験勉強も大変だったが、大学に（　　　）もっと大変だった。", a: "入ってからの方が", ops: ["入ってからの方が", "入る前より", "入るとすぐ", "入ったばかり"] },
+    { q: "いつも味噌汁のにおい（　　　）。", a: "がしてくる", ops: ["がしてくる", "をしてくる", "がなる", "をなる"] },
+    { q: "明日会議があるのでこの仕事は今日中に（　　　）。", a: "やってしまいたい", ops: ["やってしまいたい", "やっていたので", "やっているから", "やるとき"] },
+        { q: "雨が降る(　　　 )、出かけません。", a: "なら", ops: ["なら", "だから", "まで", "だけ"] },
+        { q: "彼は医者に( 　　　)たいと思っています。", a: "なり", ops: ["なる", "なり", "なって", "なった"] },
+        { q: "この問題は私には難し( 　　　)ます。", a: "すぎ", ops: ["すぎ", "すぎる", "すぎて", "すぎだ"] },
+        { q: "時間があれば映画を見に行く(　　　 )です。", a: "つもり", ops: ["つもり", "べき", "はず", "よう"] },
+        { q: "彼は走る( 　　　)が速いです。", a: "の", ops: ["の", "こと", "もの", "は"] },
+        { q: "日本語を勉強し( 　　　)、日本へ行きたいです。", a: "て", ops: ["て", "で", "がら", "たり"] },
+        { q: "明日は雨が降るか( 　　　)分かりません。", a: "どうか", ops: ["どうか", "どう", "かどう", "なにか"] },
+        { q: "このケーキは甘すぎて食べられ(　　　 )。", a: "ません", ops: ["ません", "ないで", "ず", "ぬ"] },
+        { q: "彼は宿題をやらない( 　　　)寝てしまった。", a: "で", ops: ["で", "に", "と", "を"] },
+
+        { q: "駅まで歩いて10分(　　　 )かかります。", a: "ぐらい", ops: ["ぐらい", "だけ", "しか", "ほどで"] },
+        { q: "忙しくて昼ご飯を食べる(　　　 )なかった。", a: "暇（ひま）も", ops: ["暇（ひま）も", "ことも", "ものも", "わけも"] },
+        { q: "彼女は歌が上手(　　　 )、ダンスもできます。", a: "なだけでなく", ops: ["なだけでなく", "だけで", "しか", "くらい"] },
+        { q: "この仕事は誰でもできる(　　　 )簡単です。", a: "ほど", ops: ["ほど", "くら", "のに", "だけ"] },
+        { q: "これは私が作ったケーキ(　　　 )。", a: "です", ops: ["です", "だん", "でる", "します"] },
+        { q: "疲れたので少し休む(　　　 )にします。", a: "こと", ops: ["こと", "もの", "の", "わけ"] },
+        { q: "先生がおっしゃった( 　　　)、この問題は難しいです。", a: "とおり", ops: ["とおり", "ように", "みたい", "そう"] },
+        { q: "時間になった(　　　 )、始めましょう。", a: "ので", ops: ["ので", "のに", "でも", "しか"] },
+        { q: "彼は本を読み( 　　　)音楽を聞いています。", a: "ながら", ops: ["ながら", "て", "で", "たり"] },
+        { q: "日本に来てから寿司を食べる( 　　　)好きになりました。", a: "のが", ops: ["のが", "こと", "ものが", "わけが"] },
+   { q: "あの人はいつも＜親切＞です。", a: "しんせつ", ops: ["せんせい", "しんせい", "せつしん", "しんせつ"] },
+   { q: "＜科学＞の授業が好きです。。", a: "かがく", ops: ["かがく", "ががく", "がかく", "かくが"] },
+        { q: "昨日買った本をまだ読んで(　　　 )。", a: "いません", ops: ["いません", "ありません", "ませんだ", "ないん"] },
+        { q: "この問題は私には解ける(　　　 )ありません。", a: "わけでは", ops: ["わけでは", "では", "しか", "だけ"] },
+        { q: "彼は来る(　　　 )来ないか分かりません。", a: "か", ops: ["か", "の", "で", "は"] },
+        { q: "そんな危ないことはやめた(　　　 )いいです。", a: "ほうが", ops: ["ほうが", "だけが", "べきが", "ものが"] },
+        { q: "もっと早く来ればよかった(　　　 )思います。", a: "と", ops: ["と", "に", "で", "を"] },
+        { q: "彼は日本語が話せる( 　　　)になりました。", a: "よう", ops: ["よう", "ため", "こと", "まで"] },
+        { q: "この仕事は一人でできる( 　　　)ではありません。", a: "もの", ops: ["もの", "ことが", "ため", "よう"] },
+        { q: "夜遅くまで起きていた(　　　 )、寝坊しました。", a: "ので", ops: ["ので", "のに", "けど", "からで"] },
+        { q: "雨なのに傘を持たないで出かけて(　　　 )。", a: "しまった", ops: ["しまった", "しまう", "しまい", "しまって"] },
+        { q: "この問題は簡単(　　　 )見えますが、実は難しいです。", a: "そうに", ops: ["そうに", "ように", "みたい", "ほどに"] },
+        
+    { q: "ほしいけど、＜価格＞がわかりません。", a: "値段（ねだん）", ops: ["機能（きのう）", "中身（なかみ）", "値段（ねだん）", "原因（げんいん）"] },
+    { q: "梅雨の時期は、雨の日が続いて＜うんざり＞する。", a: "いやになる", ops: ["不安になる", "困る", "いやになる", "腹が立つ"] },
+    { q: "弟とけんかになって、＜つい＞叩いてしまった。", a: "思わず", ops: ["かなり", "思わず", "しっかり", "いきなり"] },
+    { q: "箱の中に余ったおかしを＜詰めた＞。", a: "いっぱい入れた", ops: ["いっぱい入れた", "きれいに置いた", "捨てた", "片づけた"] },
+    { q: "＜通勤＞には、１時間くらいかかります。", a: "仕事に行く", ops: ["学校で食べる", "学校に通う", "仕事をする", "仕事に行く"] },
+    { q: "英語のレポートが＜完成＞しました。", a: "できました", ops: ["できました", "書きました", "もらいました", "説明しました"] },
+    { q: "この写真を見て、＜ますます＞そこに行きたくなった。", a: "さらに", ops: ["だいぶ", "すごく", "かなり", "さらに"] },
+    { q: "よく、兄と＜そっくり＞だと言われます。", a: "似ている", ops: ["似ている", "仲がいい", "合わない", "出かける"] },
+    { q: "なにか、もっといい＜方法＞はありませんか。", a: "やり方", ops: ["話し方", "飲み方", "食べ方", "やり方"] },
+    { q: "林さんはいつも＜勝手＞に行動するので、よく部長に注意される。", a: "許可なく", ops: ["突然", "自然に", "不まじめに", "許可なく"] }
+    ,
+    { q: "長い時間スマホを見ていたら、目が＜いたく＞なった。", a: "痛く", ops: ["病く", "痛く", "症く", "疲く"] },
+    { q: "10年後の＜みらい＞は、どうなっているのでしょうか。", a: "未来", ops: ["未来", "来未", "末来", "末末"] },
+    { q: "ここにある飲み物は、＜じゆう＞に飲んでいいです。", a: "自由", ops: ["自申", "白由", "自中", "自由"] },
+    { q: "この店の料理は、味が＜うすい＞。", a: "薄い", ops: ["薄い", "細い", "軽い", "弱い"] },
+    { q: "この書類を田中さんに（　　　）ください。", a: "渡して", ops: ["持して", "渡して", "伝して", "連して"] },
+    { q: "このいすは＜かるい＞ですね。", a: "軽い", ops: ["軽い", "厚い", "短い", "重い"] },
+    { q: "夜になるとカエルの＜なき＞声が聞こえる。", a: "鳴き", ops: ["烏き", "鳥き", "島き", "鳴き"] },
+    { q: "久しぶりに＜うんてん＞をしました。", a: "運転", ops: ["軍軽", "運慶", "運転", "軍転"] },
+
+
+    { q: "飼っていた鳥が、＜にげて＞しまった。", a: "逃げて", ops: ["速げて", "造げて", "逃げて", "追げて"] },
+    { q: "この店は、日曜日は＜えいぎょう＞していない。", a: "営業", ops: ["栄行", "栄業", "営行", "営業"] },
+    { q: "待ち合わせの時間を（　　　）もらえる？", a: "変えて", ops: ["果えて", "可えて", "変えて", "加えて"] },
+    { q: "さっきの問題は、＜ふくざつ＞で難しかった。", a: "複雑", ops: ["複稚", "複雑", "復稚", "復雑"] },
+    { q: "まず＜さいしょ＞に、何をしたらいいですか。", a: "最初", ops: ["再始", "再初", "最始", "最初"] },
+    { q: "この辺りは、夜はとても＜しずか＞です。", a: "静か", ops: ["静か", "情か", "晴か", "清か"] },
+    { q: "事故の＜原因＞を調べる。", a: "げんいん", ops: ["ごんいん", "げんいん", "えんいん", "げいいん"] },
+    { q: "どちらにするか＜迷って＞いる。", a: "まよって", ops: ["こまって", "まいって", "まよって", "はかって"] },
+    { q: "＜恋愛＞小説を読みます。", a: "れんあい", ops: ["れんあい", "へんあい", "こいあい", "れいあい"] },
+    { q: "アルバイトを＜募集＞します。", a: "ぼしゅう", ops: ["おうぼ", "れんしゅう", "ぼしゅう", "しゅうしゅう"] },
+    { q: "夜遅く一人で歩くのは＜危険＞だ。", a: "きけん", ops: ["ぎけん", "きげん", "ぎげん", "きけん"] },
+    { q: "大学で＜環境＞について勉強している。", a: "かんきょう", ops: ["かんぎょう", "がんきょう", "かんきょう", "がんぎょう"] },
+    { q: "家の前に＜畑＞があります。", a: "はたけ", ops: ["はたけ", "いけ", "たんぼ", "こや"] },
+    { q: "迷ったが、＜最後＞には決めた。", a: "けっきょく", ops: ["けっきょく", "ついでに", "せっかく", "そのうち"] },
+    { q: "＜徐々に＞良くなっている。", a: "少しずつ", ops: ["完全に", "かなり", "少しずつ", "ほとんど"] },
+    { q: "＜余計な＞話ばかりしている。", a: "必要ではない", ops: ["楽しい", "必要ではない", "大切な", "大変ではない"] },
+    { q: "交差点の＜先に＞川がある。", a: "向こう", ops: ["正面", "向こう", "手前", "そば"] },
+    { q: "本を電車に＜うっかり＞置いてきた。", a: "注意していなくて", ops: ["負担していなくて", "信用していなくて", "注意していなくて", "忘れていなくて"] },
+    { q: "予約を（　　　）したい。", a: "キャンセル", ops: ["テクニック", "キャンセル", "バーゲン", "セール"] },
+    { q: "大雨の（　　　）で遅れている。", a: "影響", ops: ["非常", "情報", "影響", "指示"] },
+    { q: "係の人に声を（　　　）ください。", a: "かけて", ops: ["出して", "言って", "鳴って", "かけて"] },
+    { q: "野菜や果物を生産している。", a: "農業", ops: ["農業", "工業", "職業", "作業"] },
+    { q: "留学してみて（　　　）自分の国の良さがわかった。", a: "あらためて", ops: ["あらためて", "かえって", "けっして", "あらかじめ"] },
+    { q: "予約の時間を（　　　）する。", a: "変更", ops: ["変化", "変更", "交代", "交換"] },
+    { q: "試験に失敗して（　　　）を受けた。", a: "ショック", ops: ["チャレンジ", "マナー", "ショック", "チェック"] },
+    { q: "（　　　）になって本を読んでいた。", a: "むちゅう", ops: ["しゅうちゅう", "むちゅう", "とうぜん", "りっぱ"] },
+    { q: "部屋の中が（　　　）している。", a: "じめじめ", ops: ["ぽかぽか", "じめじめ", "どんどん", "そろそろ"] },
+    { q: "（　　　）性格で意見を変えない。", a: "がんこな", ops: ["がんこな", "おせっかいな", "まじめな", "クールな"] },
+    { q: "桜の木が（　　　）いた。", a: "咲いて", ops: ["伸びて", "咲いて", "植えて", "進めて"] },
+
+
+
+
+];
+
+  
+  let currentLevel = "N2";
+
+    let exp = 0;
+    let lv = 1;
+    let isBgmPlaying = false;
+
+    let bossBattle = false;
+    let bossStreak = 0;
+    let isPotion = false;
+    const bossImage = "BOSS.png";
+    const clearEndings = [
+        {
+            img: "ending1.jpg",
+            text: "ガーディアンを倒し、でんせつのさかなをてにいれた！"
+        }
+    ];
+    const monsterImg = document.getElementById('monster-img');
+    const monsterWrapper = document.getElementById('monster-wrapper');
+    const audio = document.getElementById('bgm');
+let party = [];
+
+function loadImage(src){
+    const img = new Image();
+    img.src = src;
+    return img;
+}
+const friendSets = [
+
+    {
+        left: loadImage("img/hero1_left.png"),
+        right: loadImage("img/hero1_right.png"),
+        up: loadImage("img/hero1_up.png"),
+        down: loadImage("img/hero1_down.png")
+    },
+
+    {
+        left: loadImage("img/hero2_left.png"),
+        right: loadImage("img/hero2_right.png"),
+        up: loadImage("img/hero2_up.png"),
+        down: loadImage("img/hero2_down.png")
+    },
+
+    {
+        left: loadImage("img/hero3_left.png"),
+        right: loadImage("img/hero3_right.png"),
+        up: loadImage("img/hero3_up.png"),
+        down: loadImage("img/hero3_down.png")
+    },
+
+    {
+        left: loadImage("img/dolphin_left.png"),
+        right: loadImage("img/dolphin_right.png"),
+        up: loadImage("img/dolphin_up.png"),
+        down: loadImage("img/dolphin_down.png")
+    }
+];
+const player = {
+    x: 2,
+    y: 2
+};
+
+let hp = 100;
+let monsterHp = 30;
+let inBattle = false;
+
+const grassImg = new Image();
+grassImg.src = "img/grass.png";
+
+const wallImg = new Image();
+wallImg.src = "img/wall.png";
+
+
+const treeImg = new Image();
+treeImg.src = "img/tree.png";
+
+const houseImg = new Image();
+houseImg.src = "img/house.png";
+
+
+const heroImg = new Image();
+heroImg.src = "img/hero.png";
+
+
+const stairsImg = new Image();
+stairsImg.src = "img/stairs.png";
+
+
+const bonusImg = new Image();
+bonusImg.src = "img/bonus.png";
+
+const riverImg = new Image();
+riverImg.src = "img/river.png";
+
+
+const canvas = document.getElementById("field");
+const ctx = canvas.getContext("2d");
+
+
+const tileSize = 32;
+let direction = "left"
+
+
+
+const maps = [];
+
+for(let i=0;i<30;i++){
+    maps.push(generateMap());
+}
+
+function generateMap(){
+
+    const rows = 13;
+    const cols = 13;
+
+    const map = [];
+
+    for(let y=0;y<rows;y++){
+
+        map[y] = [];
+
+        for(let x=0;x<cols;x++){
+
+            if(
+                y===0 ||
+                y===rows-1 ||
+                x===0 ||
+                x===cols-1
+            ){
+                map[y][x] = 1;
+            }else{
+                map[y][x] = 0;
+            }
+        }
+    }
+
+    // 木配置
+    const treeCount =
+        Math.floor(Math.random()*10)+20;
+
+    for(let i=0;i<treeCount;i++){
+
+        const x = Math.floor(Math.random()*11)+1;
+        const y = Math.floor(Math.random()*11)+1;
+
+        if(!(x===1 && y===1)){
+
+            map[y][x] = 2;
+        }
+    }
+
+    // 階段配置
+    let sx, sy;
+
+    do{
+
+        sx = Math.floor(Math.random()*11)+1;
+        sy = Math.floor(Math.random()*11)+1;
+
+    }while(map[sy][sx] !== 0);
+
+
+    map[sy][sx] = 3;
+
+    // スタート周辺を空ける
+    map[1][1] = 0;
+    map[1][2] = 0;
+    map[2][1] = 0;
+    map[2][2] = 0;
+
+    return map;
+}
+
+
+
+let currentMapIndex = 0;
+let map = maps[currentMapIndex];
+
+const playerImgRight = new Image();
+playerImgRight.src = "img/hero_right.png";
+
+const playerImgLeft = new Image();
+playerImgLeft.src = "img/hero_left.png";
+
+const playerImgUp = new Image();
+playerImgUp.src = "img/hero_up.png";
+
+const playerImgDown = new Image();
+playerImgDown.src = "img/hero_down.png";
+function draw(){
+
+
+    party.forEach((friend, i) => {
+
+        const pos = trail[i];
+
+        if(pos){
+            friend.x = pos.x;
+            friend.y = pos.y;
+        }
+
+    });
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // マップ描画
+    for(let y=0; y<map.length; y++){
+        for(let x=0; x<map[y].length; x++){
+
+            if(map[y][x] === 0)
+                ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+            if(map[y][x] === 1)
+                ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+            if(map[y][x] === 2)
+                ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+            if(map[y][x] === 3)
+                ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        }
+    }
+
+console.log(party.length);
+console.log(trail[0])
+
+    // 仲間描画
+    for(let i=0;i<party.length;i++){
+
+        const pos = trail[(i)];
+
+        if(!pos) continue;
+
+        const friendImage =
+            friendSets[i][direction];
+
+
+
+if(!friendImage){
+    console.log("friend image undefined", i, direction);
+    continue;
+}
+
+if(
+    !friendImage.complete ||
+    friendImage.naturalWidth === 0
+){
+    console.log("friend image load error", friendImage.src);
+    continue;
+}
+
+ctx.drawImage(
+    friendImage,
+    pos.x * tileSize,
+    pos.y * tileSize,
+    tileSize,
+    tileSize
+);
+    }
+
+    // 主人公描画
+    let heroImage = heroDown;
+
+    if(direction==="left") heroImage = heroLeft;
+    if(direction==="right") heroImage = heroRight;
+    if(direction==="up") heroImage = heroUp;
+    if(direction==="down") heroImage = heroDown;
+
+if(
+    heroImage.complete &&
+    heroImage.naturalWidth > 0
+){
+    ctx.drawImage(
+        heroImage,
+        player.x * tileSize,
+        player.y * tileSize,
+        tileSize,
+        tileSize
+    );
+}
+}
+  
+
+
+
+const heroLeft = new Image();
+heroLeft.src = "img/hero_left.png";
+
+const heroRight = new Image();
+heroRight.src = "img/hero_right.png";
+
+const heroUp = new Image();
+heroUp.src = "img/hero_up.png";
+
+const heroDown = new Image();
+heroDown.src = "img/hero_down.png";
+
+function movePlayer(dx,dy){
+
+    if(dx > 0) direction = "right";
+    if(dx < 0) direction = "left";
+    if(dy < 0) direction = "up";
+    if(dy > 0) direction = "down";
+
+    const nx = player.x + dx;
+    const ny = player.y + dy;
+
+if(
+    ny < 0 ||
+    ny >= map.length ||
+    nx < 0 ||
+    nx >= map[0].length
+){
+ 
+        return;
+
+}
+if(
+    map[ny][nx] === 0 ||
+    map[ny][nx] === 3 ||
+    map[ny][nx] === 4
+){
+    
+trail.unshift({
+    x: player.x,
+    y: player.y
+});
+
+if(trail.length > 100){
+    trail.pop();
+}
+
+    player.x = nx;
+    player.y = ny;
+
+
+// 仲間を追従させる
+party.forEach((friend, i) => {
+
+    const pos = trail[i];
+
+    if(pos){
+        friend.x = pos.x;
+        friend.y = pos.y;
+    }
+
+});
+}
+
+if(map[player.y][player.x] === 3){
+
+    nextArea();
+}
+
+    draw();
+
+    if(!inBattle){
+        let encounterRate = Math.random();
+
+        if(encounterRate < 0.15){
+            startGame('N2');
+        }
+    }
+
+}
+let trail = [];
+let floor = 1;
+
+
+
+
+function nextArea(){
+ inBattle = false
+    console.log("次のエリア");
+
+ document.getElementById("game-container").style.display="none";
+    document.getElementById("field-screen").style.display="block";
+
+    floor++;
+    currentMapIndex++;
+
+// イベント発生
+
+
+
+    if(currentMapIndex >= maps.length){
+        alert("全30エリアクリア！");
+        location.reload();
+        return;
+    }
+    triggerAreaEvent();
+    map = maps[currentMapIndex];
+
+    updateMapTiles();
+    updateMonsterBackground();
+
+    // プレイヤーの位置
+    player.x = 1;
+    player.y = 1;
+
+    // trailを初期化
+    trail = [];
+
+    for(let i = 0; i < (party.length + 1) * 5; i++){
+        trail.push({
+            x: player.x,
+            y: player.y
+        });
+    }
+
+    // 仲間も同じ位置へ
+    party.forEach(friend=>{
+        friend.x = player.x;
+        friend.y = player.y;
+    });
+
+    draw();
+}
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="ArrowUp") movePlayer(0,-1);
+    if(e.key==="ArrowDown") movePlayer(0,1);
+    if(e.key==="ArrowLeft") movePlayer(-1,0);
+    if(e.key==="ArrowRight") movePlayer(1,0);
+
+});
+
+
+
+
+function updateMapTiles(){
+
+    if(currentMapIndex < 6){
+
+        grassImg.src = "img/grass_forest.png";
+        treeImg.src = "img/tree_forest.png";
+    }
+    else if(currentMapIndex < 12){
+
+        grassImg.src = "img/grass_cave.png";
+        treeImg.src = "img/rock.png";
+    }
+    else if(currentMapIndex < 18){
+
+        grassImg.src = "img/grass_desert.png";
+        treeImg.src = "img/cactus.png";
+    }
+    else if(currentMapIndex < 24){
+
+        grassImg.src = "img/snow.png";
+        treeImg.src = "img/ice.png";
+    }
+    else{
+
+        grassImg.src = "img/demonfloor.png";
+        treeImg.src = "img/lava.png";
+    }
+
+}
+
+
+
+
+
+function getMonsterByLevel() {
+
+    if (bossBattle) return bossImage;
+
+    let list;
+
+    if(currentMapIndex < 6){
+
+        list = monsters1; // 森
+    }
+    else if(currentMapIndex < 12){
+
+        list = monsters2; // 洞窟
+    }
+    else if(currentMapIndex < 18){
+
+        list = monsters3; // 砂漠
+    }
+    else{
+
+        list = monsters4; // 魔界
+    }
+
+    return list[
+        Math.floor(Math.random()*list.length)
+    ];
+}
+
+    function updateStats() {
+
+    while (exp >= 300) {
+        exp -= 300;
+        lv++;
+
+        seLevel.currentTime = 0;
+        seLevel.play();
+
+        if (lv >= 20 && !bossBattle) {
+            bossBattle = true;
+            bossStreak = 0;
+
+            document.getElementById('text').innerHTML =
+            "<span style='color:#ff0'>★★★★ 魔王出現！ ★★★★<br>5問連続正解で勝利！</span>";
+
+            changeMonster();
+        }
+
+        if (bossBattle && bossBgm.paused) {
+            audio.pause();
+            bossBgm.currentTime = 0;
+            bossBgm.play();
+        }
+    }
+
+    // ✅ ★これをここに入れる（超重要）
+    updateMonsterBackground();
+　
+    document.getElementById('hp').innerText = hp;
+    document.getElementById('exp').innerText = exp;
+    document.getElementById('lv').innerText = lv;
+}
+
+//背景
+
+
+    
+        // 新しいモンスターを出す関数
+        function changeMonster() {
+
+monsterImg.style.display = "block";
+
+    if (bossBattle) {
+        monsterImg.src = bossImage;
+        monsterImg.classList.add("float"); // ✅これ追加
+        return;
+    }
+
+    monsterImg.style.opacity = "0";
+
+    setTimeout(() => {
+
+        const newMonster = getMonsterByLevel();
+
+        monsterImg.src = newMonster;
+
+        monsterImg.classList.remove("float");
+        void monsterImg.offsetWidth; // リセット
+        monsterImg.classList.add("float");
+
+        monsterImg.style.opacity = "1";
+
+    }, 300);
+}     
+
+function getAreaName() {
+
+    if (bossBattle) return "Demon King Castle";
+
+    if(currentMapIndex < 6){
+        return "Forest";
+    }
+    else if(currentMapIndex < 12){
+        return "Cave";
+    }
+    else if(currentMapIndex < 18){
+        return "Desert";
+    }
+    else if(currentMapIndex < 24){
+        return "Snow Land";
+    }
+    else{
+        return "Demon Realm";
+    }
+}
+
+
+function getWinImage(){
+
+    if(currentMapIndex < 6){
+        return "img/penguinwin.png";
+    }
+    else if(currentMapIndex < 12){
+        return "img/penguinwin2.png";
+    }
+    else if(currentMapIndex < 18){
+        return "img/penguinwin3.png";
+    }
+    else if(currentMapIndex < 24){
+        return "img/penguinwin4.png";
+    }
+
+    else{
+        return "img/demonwin.png";
+    }
+}
+
+
+    let currentAnswer = "";
+
+
+function loadQuestion() {
+
+    document.getElementById('area-name').innerText = getAreaName();
+
+    const list = questions2;
+
+    const qData =
+    list[Math.floor(Math.random() * list.length)];
+
+
+    currentAnswer = qData.a;
+const imgEl = document.getElementById("question-image");
+
+if(qData.img){
+
+    imgEl.src = qData.img;
+    imgEl.style.display = "block";
+
+}else{
+
+    imgEl.style.display = "none";
+
+}
+    document.getElementById('text').innerHTML =
+        `<b></b><br>${qData.q}`;
+
+    const optionsDiv = document.getElementById('options');
+    optionsDiv.innerHTML = '';
+
+    qData.ops.sort(() => Math.random() - 0.5).forEach(op => {
+        const btn = document.createElement('button');
+        btn.innerHTML = op;
+        btn.onclick = () => checkAnswer(op, qData.a);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+
+function checkAnswer(selected, correct) {
+
+    const textEl = document.getElementById('text');
+
+    // ✅ 正解
+    if (selected === correct) {
+
+        playHitEffect();
+shakeMonster();
+        // ✅ モンエネ処理
+        if (isPotion) {
+
+            hp = Math.min(hp +40 , 100);
+
+            textEl.innerHTML =
+            "<span style='color:#0ff'>モンエネを飲んだ！HP回復！</span>";
+
+            seHeal.currentTime = 0;
+            seHeal.play();
+
+            isPotion = false;
+
+        } else {
+
+
+            // ✅ ボス戦
+            if (bossBattle) {
+
+                bossStreak++;
+
+                // ✅ 5連続でエンディング
+                if (bossStreak >= 5) {
+
+                    const ending = clearEndings[Math.floor(Math.random() * clearEndings.length)];
+
+                    // BGM停止
+                    audio.pause();
+                    bossBgm.pause();
+
+                    // エンディングBGM
+                    endingBgm.currentTime = 0;
+                    endingBgm.play();
+
+                    // 画像
+                    monsterImg.src = ending.img;
+
+                    // メッセージ
+                    textEl.innerHTML = `
+                        <span style='color:#ff0'>
+                        ★★★★★ クリア！ ★★★★★<br>
+                        ${ending.text}
+                        </span>`;
+
+                    // ボタン
+                    document.getElementById("options").innerHTML =
+                        '<button onclick="location.reload()">もう一度遊ぶ</button>';
+
+                    return;
+                }
+
+                // ✅ ボスダメージ表示
+                textEl.innerHTML =
+                `<span style='color:#ff0'>
+                魔王にダメージ！<br>
+                ${bossStreak}/5
+                </span>`;
+
+ 
+} else {
+    exp += 50;
+
+    battleWin = true;
+
+    textEl.innerHTML =
+    "<span style='color:#0f0'>正解！道をゆずってくれた。 経験値を50獲得<br>Please press the OK button.</span>";
+    document.getElementById("monster-img").style.display="none";
+
+
+
+
+document.getElementById("options").innerHTML =
+`
+<img src="${getWinImage()}" class="win-image float">
+`;
+
+    updateStats();
+
+    return;
+
+}
+
+
+            seHit.currentTime = 0;
+            seHit.play();
+        }
+
+    // ❌ 不正解
+    } else {
+
+        // ✅ モンエネ逃げ
+        if (isPotion) {
+
+            textEl.innerHTML =
+            "<span style='color:#0ff'>モンエネは逃げてしまった！</span>";
+
+            isPotion = false;
+
+            returnToField();
+
+
+setTimeout(() => {
+    loadQuestion();
+}, 1200)
+
+            return;
+        }
+
+        // ダメージ演出
+        document.body.style.background = "#400";
+
+        setTimeout(() => {
+            document.body.style.background = "#0078cd";
+        }, 200);
+
+        hp -= 5;
+
+        if (bossBattle) {
+
+            bossStreak = 0;
+
+            textEl.innerHTML =
+            `<span style='color:#f00'>
+            魔王の反撃！<br>
+            正解：${correct}
+            </span>`;
+
+        } else {
+
+            textEl.innerHTML =
+            `<span style='color:#f00'>
+            ミス！5ダメージ<br>
+            正解：${correct}
+            </span>`;
+        }
+
+        seDamage.currentTime = 0;
+        seDamage.play();
+
+        // ✅ ゲームオーバー
+        if (hp <= 0) {
+
+            alert("目の前が真っ暗になった...");
+
+            hp = 100;
+            exp = 0;
+            lv = 1;
+            bossBattle = false;
+            bossStreak = 0;
+
+            bossBgm.pause();
+            audio.play();
+
+            returnToField();
+        }
+    }
+
+    updateStats();
+
+    setTimeout(() => {
+        startGame('N2');
+    }, 1200);
+}
+
+
+function returnToField(){
+
+    inBattle = false;
+
+    document.getElementById("game-container").style.display="none";
+    document.getElementById("field-screen").style.display="block";
+
+
+ battleBgm.pause();
+
+    if(fieldBgm.paused){
+        fieldBgm.play();
+    }
+
+}
+
+   draw();
+ 
+
+function startGametitle(){
+
+    fieldBgm.currentTime = 0;
+    fieldBgm.play().catch(err => console.log(err));
+
+    document.getElementById("titleScreen").style.display = "none";
+    document.getElementById("field-screen").style.display = "block";
+
+    draw();
+}
+
+
+function pressOK() {
+
+    if(eventMode){
+
+        eventIndex++;
+
+        if(eventIndex >= eventMessages.length){
+
+            closeEvent();
+            return;
+        }
+
+        showEventMessage();
+        return;
+    }
+
+    if (battleWin) {
+
+        battleWin = false;
+        changeMonster();
+        returnToField();
+    }
+}
+function regenerateMap(){
+
+    // 戦闘中は使えない
+    if(inBattle) return;
+
+    maps[currentMapIndex] = generateMap();
+
+    map = maps[currentMapIndex];
+
+    // プレイヤー位置リセット
+    player.x = 1;
+    player.y = 1;
+
+    // 仲間位置リセット
+    trail = [];
+
+    for(let i=0;i<(party.length+1)*5;i++){
+        trail.push({
+            x:1,
+            y:1
+        });
+    }
+
+    party.forEach(friend=>{
+        friend.x = 1;
+        friend.y = 1;
+    });
+
+    draw();
+}
+    </script>
+    </body>
+    </html>
