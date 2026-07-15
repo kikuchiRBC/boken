@@ -99,12 +99,23 @@ rt{
     border-radius:10px;
 }
 
+
+
+
 .crossKey{
+    position:fixed;
+
+    left:20px;
+    bottom:20px;
+
     display:flex;
     flex-direction:column;
     align-items:center;
     gap:8px;
+
+    z-index:9999;
 }
+
 
 .crossKey .row{
     display:flex;
@@ -258,8 +269,23 @@ rt{
         font-size:0.8rem;
         padding:4px 8px;
     }
-}
 
+
+ 
+
+    .arrowBtn{
+        width:55px;
+        height:55px;
+        font-size:24px;
+    }
+
+    .okBtn,
+    .cancelBtn{
+        width:80px;
+        height:50px;
+        font-size:16px;
+    }
+}
 /* 小型スマホ */
 @media screen and (max-width:480px){
 
@@ -328,19 +354,24 @@ canvas{
 
 
 
-.controller{
-    width:100%;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    margin-top:20px;
-}
+
+
+
 
 .actionButtons{
+    position:fixed;
+
+    right:20px;
+    bottom:20px;
+
     display:flex;
     flex-direction:column;
-    gap:15px;
+    gap:10px;
+
+    z-index:9999;
 }
+
+
 
 .okBtn{
     width:100px;
@@ -413,6 +444,16 @@ canvas{
         <div class="row">
             <button class="arrowBtn" onclick="movePlayer(0,1)">↓</button>
         </div>
+    </div>
+        <div class="actionButtons">
+        <button class="okBtn" onclick="pressOK()">
+            OK
+        </button>
+
+        <button class="cancelBtn" onclick="regenerateMap()">
+            MAPreload
+        </button>
+    </div>
     </div>
 <div id="titleScreen">
     <h1>なかよし海の冒険団</h1>
@@ -487,15 +528,7 @@ canvas{
     </div>
 
 
-    <div class="actionButtons">
-        <button class="okBtn" onclick="pressOK()">
-            OK
-        </button>
 
-        <button class="cancelBtn" onclick="regenerateMap()">
-            MAPreload
-        </button>
-    </div>
 
 </div>
 
@@ -583,7 +616,7 @@ let joinFriend = null
 let startBossAfterEvent = false;
     // イベント
 function startEvent(messages, friend=null){
-
+document.querySelector(".crossKey").style.display = "none";
     eventMode = true;
 
     eventMessages = messages;
@@ -650,7 +683,7 @@ document.getElementById("options").style.display = "grid";
     }
 
     document.getElementById("options").style.display = "grid";
-
+document.querySelector(".crossKey").style.display = "flex";
     document.getElementById("game-container").style.display = "none";
     document.getElementById("field-screen").style.display = "block";
 draw();
@@ -848,7 +881,7 @@ case 30:
 }
 
 function startGame(level) {
-
+document.querySelector(".crossKey").style.display = "none";
 fieldBgm.pause();
 
 battleBgm.currentTime = 0;
@@ -1976,7 +2009,7 @@ setTimeout(() => {
 function returnToField(){
 
     inBattle = false;
-
+document.querySelector(".crossKey").style.display = "flex";
     document.getElementById("game-container").style.display="none";
     document.getElementById("field-screen").style.display="block";
 
@@ -1992,10 +2025,13 @@ function returnToField(){
    draw();
  
 
+
 function startGametitle(){
 
+    document.querySelector(".crossKey").style.display = "flex";
+
     fieldBgm.currentTime = 0;
-    fieldBgm.play().catch(err => console.log(err));
+    fieldBgm.play();
 
     document.getElementById("titleScreen").style.display = "none";
     document.getElementById("field-screen").style.display = "block";
