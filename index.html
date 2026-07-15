@@ -160,8 +160,25 @@ rt{
 }
 
 
-            body { background: #0078cd; color: #fff; font-family: 'DotGothic16', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-            #game-container { width: 450px; background: #000; border: 4px solid #fff; padding: 20px; position: relative; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+ body {
+    background:
+        url("img/top.png") top center no-repeat,
+        url("img/bottom.png") bottom center no-repeat,
+        #0078cd;
+
+    background-size:
+        100% auto,
+        100% auto;
+
+    color: #fff;
+    font-family: 'DotGothic16', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}          #game-container { width: 450px; background: #000; border: 4px solid #fff; padding: 20px; position: relative; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
             .stats { display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 10px; border-bottom: 2px solid #fff; padding-bottom: 5px; }
 #monster-area { height: 200px;display: flex;justify-content: center;align-items: center;margin-bottom: 15px;position: relative;overflow: hidden; background-size: cover;background-position: center;background-repeat: no-repeat;
 }
@@ -566,6 +583,10 @@ canvas{
     </audio>
 
 
+<audio id="bgm-win">
+        <source src="win.mp3" type="audio/mpeg">
+</audio>
+
 
     <script>
         
@@ -585,6 +606,9 @@ canvas{
 
 const fieldBgm = document.getElementById("bgm-field");
 const battleBgm = document.getElementById("bgm");
+
+const winBgm =
+document.getElementById("bgm-win");
 
 const monsterArea =
 document.getElementById("monster-area");
@@ -1904,6 +1928,19 @@ shakeMonster();
     exp += 50;
 
     battleWin = true;
+battleBgm.pause();
+bossBgm.pause();
+
+seDamage.currentTime = 0;
+seDamage.play();
+updateStats();
+setTimeout(() => {
+
+    winBgm.currentTime = 0;
+    winBgm.play();
+
+}, 500);
+
 
     textEl.innerHTML =
     "<span style='color:#0f0'>正解！道をゆずってくれた。 経験値を50獲得<br>Please press the OK button.</span>";
@@ -1941,7 +1978,7 @@ document.getElementById("options").innerHTML =
 
             returnToField();
 
-
+updateStats();
 setTimeout(() => {
     loadQuestion();
 }, 1200)
@@ -1995,33 +2032,44 @@ setTimeout(() => {
             audio.play();
 
             returnToField();
+             return;
         }
+        
+updateStats();
+
+setTimeout(() => {
+    loadQuestion();
+}, 1200);
+
+return;
+
     }
 
-    updateStats();
-
-    setTimeout(() => {
-        startGame('N2');
-    }, 1200);
+  
+    
 }
 
 
 function returnToField(){
 
     inBattle = false;
-document.querySelector(".crossKey").style.display = "flex";
-    document.getElementById("game-container").style.display="none";
-    document.getElementById("field-screen").style.display="block";
 
+    document.querySelector(".crossKey").style.display = "flex";
 
- battleBgm.pause();
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("field-screen").style.display = "block";
+
+    battleBgm.pause();
+    bossBgm.pause();
+
+    winBgm.pause();
+    winBgm.currentTime = 0;
 
     if(fieldBgm.paused){
+        fieldBgm.currentTime = 0;
         fieldBgm.play();
     }
-
 }
-
    draw();
  
 
@@ -2061,6 +2109,9 @@ function pressOK() {
         battleWin = false;
         changeMonster();
         returnToField();
+        winBgm.pause();
+winBgm.currentTime = 0;
+
     }
 }
 function regenerateMap(){
