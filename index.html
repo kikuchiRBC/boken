@@ -758,8 +758,10 @@ const openingBgm =document.getElementById("bgm-opening");
     const monsters2 = ["kurage.png","kani.png","kame.png","fugu.png", "oumugai.png", "utsubo.png","shark.png","fugu.png","tako.png","manta.png"];
     const monsters3 = ["img/monst/scopion.png","img/monst/camel.png","img/monst/fenek.png","img/monst/olix.png",
                         "img/monst/pancer.png","img/monst/sanhowk.png","img/monst/rezerd.png","img/monst/sandturtle.png","img/monst/snake.png"];
-    const monsters4 = ["img/monst/dragon.png","img/monst/falcon.png","img/monst/fenix.png","img/monst/gorem.png","img/monst/pison.png","img/monst/spider.png","img/monst/wolf.png"];
-    const monsters5 = ["img/monst/scopion.png",];
+    const monsters4 = ["img/monst/icerabit.png","img/monst/mogura.png",,"img/monst/snowbear.png","img/monst/snowcat.png","img/monst/snowfow.png"
+        ,"img/monst/snowowl.png","img/monst/snowpenguin.png","img/monst/snowshika.png","img/monst/snowwolf.png"
+    ];
+     const monsters5 = ["img/monst/dragon.png","img/monst/falcon.png","img/monst/fenix.png","img/monst/gorem.png","img/monst/pison.png","img/monst/spider.png","img/monst/wolf.png"];
 
 const fieldBgm = document.getElementById("bgm-field");
 const battleBgm = document.getElementById("bgm");
@@ -2022,24 +2024,23 @@ function getMonsterByLevel() {
     let list;
 
     if(currentMapIndex < 6){
-
         list = monsters1; // 森
     }
     else if(currentMapIndex < 12){
-
         list = monsters2; // 洞窟
     }
     else if(currentMapIndex < 18){
-
         list = monsters3; // 砂漠
     }
+    else if(currentMapIndex < 24){
+        list = monsters4; // 雪
+    }
     else{
-
-        list = monsters4; // 魔界
+        list = monsters5; // 魔界
     }
 
     return list[
-        Math.floor(Math.random()*list.length)
+        Math.floor(Math.random() * list.length)
     ];
 }
 
