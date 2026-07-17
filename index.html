@@ -2246,7 +2246,15 @@ shakeMonster();
                     endingBgm.play();
 
                     // 画像
-                    monsterImg.src = ending.img;
+                    
+monsterImg.style.display = "none";
+monsterArea.style.backgroundImage =
+    `url('${ending.img}')`;
+
+monsterArea.style.height = "300px";
+monsterArea.style.backgroundSize = "cover";
+monsterArea.style.backgroundPosition = "center";
+
 
                     // メッセージ
                     textEl.innerHTML = `
@@ -2474,6 +2482,10 @@ function useHeal(){
     }
 
     hp = Math.min(hp + 30, 100);
+
+    // 回復SE
+    seHeal.currentTime = 0;
+    seHeal.play();
 
     updateStats();
 
