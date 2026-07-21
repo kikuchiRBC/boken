@@ -42,6 +42,19 @@ rt{
     animation:battleZoom 0.6s ease-out;
 }
 
+
+#titleScreen{
+    text-align:center;
+}
+
+#titleLogo{
+    width:90%;
+    max-width:700px;
+    display:block;
+    margin:20px auto;
+}
+
+
 @keyframes battleZoom{
 
     0%{

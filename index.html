@@ -35,10 +35,18 @@
         </button>
     </div>
     </div>
+
+
+
 <div id="titleScreen">
-    <h1>なかよし海の冒険団</h1>
-    <button onclick="startGametitle()">ゲームスタート</button>
+   <img id="titleLogo" src="img/title.jpg" alt="なかよし海の">
+  
+<button onclick="startGametitle()">
+    ゲームスタート
+</button>
+
 </div>
+
 
 <div id="field-screen" style="display:none;">
 
@@ -103,6 +111,7 @@
     <div id="text">
       冒険が始まる！
     </div>
+    </div>
 <div id="skillButtons">
 
 <button id="healBtn" class="skillBtn" onclick="useHeal()">
@@ -122,7 +131,7 @@
 
 </div>
 
-<div class="options-grid" id="options">
+<div class="options-grid" id="options" style="display:none;">
     <button onclick="startGame('N3')"></button>
     <button onclick="startGame('N2')"></button>
     <button onclick="startGame('N1')"></button>
@@ -260,8 +269,7 @@ const monsterNames = {
     "img/monst/mogura.png":"ひきこもぐら",
     "img/monst/snowbear.png":"<ruby>不安<rt>ふあん</rt></ruby>グマ",
     "img/monst/snowcat.png":"<ruby>気<rt>き</rt></ruby>まぐれキャット",
-    "img/monst/snowfow.png":"<ruby>静<rt>しず</rt></ruby>かフクロウ",
-    "img/monst/snowowl.png":"<ruby>寒<rt>さむ</rt></ruby>いフクロウ",
+    "img/monst/snowowl.png":"<ruby>静<rt>しず</rt></ruby>かフクロウ",
     "img/monst/snowpenguin.png":"ひかえめペンギン",
     "img/monst/snowshika.png":"<ruby>弱気<rt>よわき</rt></ruby>シカ",
     "img/monst/snowwolf.png":"<ruby>孤独<rt>こどく</rt></ruby>ウルフ",
@@ -392,32 +400,45 @@ if(joinFriend === "dolphin"){
 }
 
     // 最終イベント後ならボス戦
-    if(startBossAfterEvent){
+if(startBossAfterEvent){
 
-        startBossAfterEvent = false;
+    startBossAfterEvent = false;
 
-        bossBattle = true;
-        bossStreak = 0;
+    bossBattle = true;
+    bossStreak = 0;
 
-        document.getElementById("field-screen").style.display = "none";
-        document.getElementById("game-container").style.display = "block";
+    canHeal = true;
+    canChangeQuestion = true;
+    canHint = true;
 
-        changeMonster();
+    document.getElementById("field-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
 
-        document.getElementById("text").innerHTML =
-        "★★★★ ガーディアン出現！ ★★★★<br>5問連続正解して説得しよう！";
+    document.getElementById("skillButtons").style.display = "flex";
 
-     
-document.getElementById("options").style.display = "grid";
+    document.getElementById("healBtn").style.display =
+        party.length >= 1 ? "block" : "none";
 
-    changeMonster();
+    document.getElementById("changeBtn").style.display =
+        party.length >= 2 ? "block" : "none";
+
+    document.getElementById("hintBtn").style.display =
+        party.length >= 3 ? "block" : "none";
+
+    document.getElementById("healBtn").disabled = false;
+    document.getElementById("changeBtn").disabled = false;
+    document.getElementById("hintBtn").disabled = false;
+
+    document.getElementById("healBtn").innerHTML = "🦦 回復";
+    document.getElementById("changeBtn").innerHTML = "🐋 問題変更";
+    document.getElementById("hintBtn").innerHTML = "🐬 2択ヒント";
+
+    document.getElementById("options").style.display = "grid";
 
     loadQuestion();
 
     return;
-
-    }
-
+}
     document.getElementById("options").style.display = "grid";
     document.getElementById("skillButtons").style.display = "flex"
 document.querySelector(".crossKey").style.display = "flex";
@@ -1208,6 +1229,10 @@ bonusImg.src = "img/bonus.png";
 const riverImg = new Image();
 riverImg.src = "img/river.png";
 
+const innImg = new Image();
+innImg.src = "img/inn.png";
+
+
 
 const canvas = document.getElementById("field");
 const ctx = canvas.getContext("2d");
@@ -1221,7 +1246,7 @@ let direction = "left"
 const maps = [];
 
 for(let i=0;i<30;i++){
-    maps.push(generateMap());
+    maps.push(generateMap(i));
 }
 
 function startEnding(){
@@ -1247,7 +1272,7 @@ function showEndingScene(){
         scene.text;
 
     document.getElementById("options").innerHTML =
-        "<button onclick='nextEnding()'>つづく</button>";
+        "";
 }
 function nextEnding(){
 
@@ -1266,7 +1291,7 @@ function nextEnding(){
 
     showEndingScene();
 }
-function generateMap(){
+function generateMap(index){
 
     const rows = 13;
     const cols = 13;
@@ -1319,6 +1344,26 @@ function generateMap(){
 
 
     map[sy][sx] = 3;
+
+    // 5階ごとに宿配置
+    if(
+        (index + 1) % 5 === 0 &&
+        (index + 1) < 30
+    ){
+
+        let ix, iy;
+
+        do{
+            ix = Math.floor(Math.random()*11)+1;
+            iy = Math.floor(Math.random()*11)+1;
+        }
+        while(map[iy][ix] !== 0);
+
+        map[iy][ix] = 4;
+    }
+
+    
+
 
     // スタート周辺を空ける
     map[1][1] = 0;
@@ -1377,7 +1422,9 @@ function draw(){
 
             if(map[y][x] === 3)
                 ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
-        }
+            if(map[y][x] === 4)
+               ctx.drawImage(innImg,x * tileSize,y * tileSize,tileSize,tileSize
+    );       }
     }
 
 console.log(party.length);
@@ -1511,6 +1558,11 @@ if(map[player.y][player.x] === 3){
     nextArea();
 }
 
+if(map[player.y][player.x] === 4){
+    visitInn();
+     draw();
+        return;   // ←追加
+}
     draw();
 
     if(!inBattle){
@@ -1526,7 +1578,29 @@ let trail = [];
 let floor = 1;
 
 
+function visitInn(){
 
+    hp = 200;
+
+    updateStats();
+
+    startEvent([
+        {
+            img:"img/inn1.jpg",
+            text:"森の中に宿（やど）をみつけた"
+        },
+        {
+            img:"img/inn2.jpg",
+            text:"ペンギン：きょうは疲れたからもうねよう...。"
+        },
+                {
+            img:"img/inn2.jpg",
+            text:"HPがぜんかいふくした！"
+        }
+    ]);
+
+    map[player.y][player.x] = 0;
+}
 
 function nextArea(){
  inBattle = false
@@ -2210,6 +2284,12 @@ setTimeout(()=>{
 
 function pressOK() {
 
+    // エンディング中
+    if(endingMode){
+        nextEnding();
+        return;
+    }
+
     if(eventMode){
 
         eventIndex++;
@@ -2239,7 +2319,7 @@ function regenerateMap(){
     // 戦闘中は使えない
     if(inBattle) return;
 
-    maps[currentMapIndex] = generateMap();
+   maps[currentMapIndex] = generateMap(currentMapIndex);
 
     map = maps[currentMapIndex];
 
