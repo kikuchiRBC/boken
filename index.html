@@ -90,6 +90,7 @@
         
 
 <div id="monster-area">
+
     <div id="hit-effect"></div> 
     
 
@@ -172,6 +173,10 @@
         <source src="lastboss.mp3" type="audio/mpeg">
     </audio>
 
+<audio id="bgm-guardian" loop>
+ <source src="guardian.mp3" type="audio/mpeg">   
+</audio>
+
 
     <audio id="bgm-field" loop>
         <source src="field.mp3" type="audio/mpeg">
@@ -198,7 +203,8 @@
     const bossBgm = document.getElementById("bgm-boss");
     const seHeal = document.getElementById("se-heal");
     
-const openingBgm =document.getElementById("bgm-opening");
+    const guardianBgm =document.getElementById("bgm-guardian");
+    const openingBgm =document.getElementById("bgm-opening");
 
     const monsters1 = ["img/monst/araiguma.png","img/monst/bear.png","img/monst/fox.png","img/monst/harinezumi.png", "img/monst/owl.png", "img/monst/rabit.png","img/monst/rishu.png","img/monst/shika.png","img/monst/shimarisu.png","img/monst/sukank.png"];
     const monsters2 = ["kurage.png","kani.png","kame.png","fugu.png", "oumugai.png", "utsubo.png","shark.png","fugu.png","tako.png","manta.png"];
@@ -402,6 +408,11 @@ if(joinFriend === "dolphin"){
     // 最終イベント後ならボス戦
 if(startBossAfterEvent){
 
+guardianBgm.pause();
+
+bossBgm.currentTime = 0;
+bossBgm.play();
+
     startBossAfterEvent = false;
 
     bossBattle = true;
@@ -590,7 +601,7 @@ startEvent([
     text:"よーし！ みんなで<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>おう！"
 },
 {
-    img:"img/orcapenguin.png",
+    img:"img/orca.png",
     text:"♪シャチが<ruby>仲間<rt>なかま</rt></ruby>になった！"
 }
 ],"orca");
@@ -654,11 +665,39 @@ startEvent([
     text:"イルカ：よーし！ <ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>見<rt>み</rt></ruby>つけるぞ！"
 },
 {
-    img:"img/dolphinpenguin.png",
+    img:"img/dolphin.png",
     text:"♪イルカが<ruby>仲間<rt>なかま</rt></ruby>になった！"
 }
 ],"dolphin");
             break;
+case 24:
+
+    eventDone[currentMapIndex] = true;
+
+    startEvent([
+    {
+    img:"img/orca.png",
+    text:"シャチ：あれを見て！ <ruby>火山<rt>かざん</rt></ruby>がふんかしている！"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：<ruby>熱気<rt>ねっき</rt></ruby>がすごい…。ぼくたち、ここまで来たんだね。"
+},
+{
+    img:"img/penguin.png",
+    text:"ペンギン：きっと<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなは、この<ruby>先<rt>さき</rt></ruby>にいる！"
+},
+{
+    img:"img/allfriends.png",
+    text:"みんなで<ruby>最後<rt>さいご</rt></ruby>の<ruby>冒険<rt>ぼうけん</rt></ruby>へ！"
+},
+    {
+        img:"img/allfriends.png",
+        text:"みんな：おー！！"
+    }
+    ]);
+
+    break;
 
 
 case 29:
@@ -666,6 +705,17 @@ case 29:
     eventDone[currentMapIndex] = true;
 
     startBossAfterEvent = true;
+
+//BGM切り替え
+    fieldBgm.pause();
+    battleBgm.pause();
+    bossBgm.pause();
+
+    const guardianBgm =
+    document.getElementById("bgm-guardian");
+
+    guardianBgm.currentTime = 0;
+    guardianBgm.play();
 
     startEvent([
     {
@@ -836,6 +886,10 @@ function toggleSound() {
         seDamage.muted = false;
         seLevel.muted = false;
         seHeal.muted = false;
+        guardianBgm.muted = false;
+        
+   guardianBgm.currentTime = 0;
+    guardianBgm.play();
 
     } else {
         btn.innerText = "🔇 SOUND OFF";
@@ -848,6 +902,7 @@ function toggleSound() {
         seDamage.muted = true;
         seLevel.muted = true;
         seHeal.muted = true;
+        guardianBgm.muted = true;
     }
 }
 
@@ -907,7 +962,7 @@ function playHitEffect() {
 { q: "事故にあった男性は＜じゅうたい＞だそうだ。", a: "重体", ops: ["十代", "重犬", "重体", "十体"] },
 { q: "今、外にいるんです。＜きたく＞したら、もう一度電話します。", a: "帰宅", ops: ["帰家", "着家", "帰宅", "着宅"] },
 { q: "＜つめたい＞ジュースを飲んだ。", a: "冷たい", ops: ["冷たい", "凍たい", "寒たい", "涼たい"] },
-{ q: "風邪のときは睡眠と＜えいよう＞をしっかりとってくださいね。", a: "栄養", ops: ["体調", "休養", "栄養", "治療"] },
+{ q: "<ruby>風邪<rt>かぜ</rt></ruby>のときは<ruby>睡眠<rt>すいみん</rt></ruby>と＜えいよう＞をしっかりとってくださいね。", a: "栄養", ops: ["体調", "休養", "栄養", "治療"] },
 { q: "世界中の人がこのニュースに＜かんしん＞を持っている。", a: "関心", ops: ["関心", "感心", "完心", "観心"] },
 { q: "工場見学をご（　　　）の方は、私にお知らせください。", a: "希望", ops: ["興味", "期待", "確認", "希望"] },
 { q: "息子の進学のために、毎月（　　　）している。", a: "貯金", ops: ["貯金", "税金", "現金", "代金"] },
@@ -1733,6 +1788,20 @@ function getMonsterByLevel() {
         seLevel.currentTime = 0;
         seLevel.play();
 
+
+    startEvent([
+        {
+            img:"img/levelup.png",
+            text:`ペンギンのレベルが ${oldLv} → ${lv} にあがった！`
+        },
+        {
+            img:"img/levelup.png",
+            text:"HPが30回復した！"
+        }
+    ]);
+}
+
+
         if (lv >= 20 && !bossBattle) {
             bossBattle = true;
             bossStreak = 0;
@@ -1748,7 +1817,7 @@ function getMonsterByLevel() {
             bossBgm.currentTime = 0;
             bossBgm.play();
         }
-    }
+    
 
     // ✅ ★これをここに入れる（超重要）
     updateMonsterBackground();
