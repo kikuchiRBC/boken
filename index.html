@@ -147,46 +147,60 @@
 
 <button id="sound-toggle" onclick="toggleSound()">🔊 SOUND ON</button>
 <audio id="se-heal">
-    <source src="se_kaihuku02.mp3" type="audio/mpeg">
+    <source src="audio/se_kaihuku02.mp3" type="audio/mpeg">
 </audio>
-
+<audio id="se-skill1">
+    <source src="audio/se_skill1.mp3" type="audio/mpeg">
+</audio>
+<audio id="se-skill2">
+    <source src="audio/se_skill2.mp3" type="audio/mpeg">
+</audio>
+<audio id="se-ice">
+    <source src="audio/se_ice.mp3" type="audio/mpeg">
+</audio>
     <audio id="bgm-ending" loop>
-        <source src="ending.mp3" type="audio/mpeg">
+        <source src="audio/ending.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="bgm" loop>
-        <source src="maou_bgm_8bit272.mp3" type="audio/mpeg">
+        <source src="audio/maou_bgm_8bit272.mp3" type="audio/mpeg">
     </audio>
     <audio id="se-hit">
-        <source src="se1.mp3" type="audio/mpeg">
+        <source src="audio/se1.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="se-damage">
-        <source src="se2.mp3" type="audio/mpeg">
+        <source src="audio/se2.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="se-levelup">
-        <source src="se_levelup.mp3" type="audio/mpeg">
+        <source src="audio/se_levelup.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="bgm-boss" loop>
-        <source src="lastboss.mp3" type="audio/mpeg">
+        <source src="audio/lastboss.mp3" type="audio/mpeg">
     </audio>
+    <audio id="bgm-event" loop>
+        <source src="audio/event.mp3" type="audio/mpeg">
+    </audio>
+<audio id="bgm-inn" loop>
+    <source src="audio/inn.mp3" type="audio/mpeg">
+</audio>
 
 <audio id="bgm-guardian" loop>
- <source src="guardian.mp3" type="audio/mpeg">   
+ <source src="audio/guardian.mp3" type="audio/mpeg">   
 </audio>
 
 
     <audio id="bgm-field" loop>
-        <source src="field.mp3" type="audio/mpeg">
+        <source src="audio/field.mp3" type="audio/mpeg">
     </audio>
 <audio id="bgm-opening" loop>
-        <source src="opening.mp3" type="audio/mpeg">
+        <source src="audio/opening.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="bgm-win">
-        <source src="win.mp3" type="audio/mpeg">
+        <source src="audio/win.mp3" type="audio/mpeg">
 </audio>
 <script src="js/questions.js"></script>
 
@@ -196,16 +210,21 @@
     let isSoundOn = true;
     let eventDone = {};
     let canHint = false;
+    let innEvent = false;
     const endingBgm = document.getElementById("bgm-ending");
     const seHit = document.getElementById("se-hit");
     const seDamage = document.getElementById("se-damage");
     const seLevel = document.getElementById("se-levelup");
     const bossBgm = document.getElementById("bgm-boss");
     const seHeal = document.getElementById("se-heal");
-    
+    const seSkill1 = document.getElementById("se-skill1");
+    const seSkill2 = document.getElementById("se-skill2");
+    const seIce = document.getElementById("se-ice");
+  
     const guardianBgm =document.getElementById("bgm-guardian");
     const openingBgm =document.getElementById("bgm-opening");
-
+    const eventBgm =document.getElementById("bgm-event");
+const innBgm = document.getElementById("bgm-inn");
     const monsters1 = ["img/monst/araiguma.png","img/monst/bear.png","img/monst/fox.png","img/monst/harinezumi.png", "img/monst/owl.png", "img/monst/rabit.png","img/monst/rishu.png","img/monst/shika.png","img/monst/shimarisu.png","img/monst/sukank.png"];
     const monsters2 = ["kurage.png","kani.png","kame.png","fugu.png", "oumugai.png", "utsubo.png","shark.png","fugu.png","tako.png","manta.png"];
     const monsters3 = ["img/monst/scopion.png","img/monst/camel.png","img/monst/fenek.png","img/monst/olix.png",
@@ -306,6 +325,7 @@ let startBossAfterEvent = false;
 let openingEvent = false;
 let hasIceSword = false;
 let canFreezeStorm = false;
+let fullScreenEvent = false;
     // イベント
  function startGametitle(){
 
@@ -340,6 +360,18 @@ startEvent([
 ]);
 }
 function startEvent(messages, friend=null){
+ // 他のBGM停止
+ fieldBgm.pause(); 
+ battleBgm.pause(); 
+ bossBgm.pause();
+
+
+ if(!openingEvent && !innEvent){
+    eventBgm.currentTime = 0;
+    eventBgm.play();
+}
+ 
+
 document.querySelector(".crossKey").style.display = "none";
     eventMode = true;
 document.getElementById("skillButtons").style.display = "none";
@@ -360,7 +392,7 @@ function showEventMessage(){
 
     const msg = eventMessages[eventIndex];
 
-    if(openingEvent){
+    if(openingEvent || fullScreenEvent){
 
         document.getElementById("monster-img").style.display = "none";
 
@@ -377,8 +409,22 @@ function showEventMessage(){
 }
 
 function closeEvent(){
+    eventBgm.pause();
+    eventBgm.currentTime = 0;
 
+    innBgm.pause();
+    innBgm.currentTime = 0;
+
+    innEvent = false;
+
+    winBgm.pause();
+    winBgm.currentTime = 0;
     eventMode = false;
+
+if(!startBossAfterEvent){
+    fieldBgm.currentTime = 0;
+    fieldBgm.play();
+}
 
 if(joinFriend && party.length < friendSets.length){
 
@@ -406,6 +452,8 @@ if(joinFriend === "dolphin"){
 if(startBossAfterEvent){
 
 guardianBgm.pause();
+fieldBgm.pause();
+fieldBgm.currentTime = 0;
 
 bossBgm.currentTime = 0;
 bossBgm.play();
@@ -463,9 +511,7 @@ document.getElementById("monster-img").style.display = "block";
 
 updateMonsterBackground();
 
-fieldBgm.currentTime = 0;
-fieldBgm.play();
-
+fullScreenEvent = false;
 updateFieldStatus();
 
 draw();
@@ -696,85 +742,23 @@ case 24:
 
     break;
 
-
 case 29:
 
-    eventDone[currentMapIndex] = true;
-
-    startBossAfterEvent = true;
-
-//BGM切り替え
-    fieldBgm.pause();
-    battleBgm.pause();
-    bossBgm.pause();
-
-    const guardianBgm =
-    document.getElementById("bgm-guardian");
-
-    guardianBgm.currentTime = 0;
-    guardianBgm.play();
-
-    startEvent([
-    {
-        img:"img/orca.png",
-        text:"シャチ：ん？ みんな、あそこを見て！"
-    },
-    {
-        img:"img/otter.png",
-        text:"カワウソ：どうしたの？"
-    },
-    {
-        img:"img/orca.png",
-        text:"シャチ：あの<ruby>建物<rt>たてもの</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>に、だれかがいるよ！"
-    },
-    {
-        img:"img/dolphin.png",
-        text:"イルカ：たしかに…。ぼくたちを<ruby>待<rt>ま</rt></ruby>っているみたいだね。"
-    },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン：もしかして、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなについて<ruby>知<rt>し</rt></ruby>っているのかな？"
-    },
-    {
-        img:"BOSS.png",
-        text:"ガーディアン：そこで<ruby>止<rt>と</rt></ruby>まれ。私は<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>守<rt>まも</rt></ruby>るガーディアンだ。"
-    },
-    {
-        img:"BOSS.png",
-        text:"これまで<ruby>数多<rt>かずおお</rt></ruby>くの<ruby>冒険者<rt>ぼうけんしゃ</rt></ruby>が、おさかなを<ruby>求<rt>もと</rt></ruby>めてここへやってきた。"
-    },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン：ぼくたちは<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うために来たんだ！"
-    },
-    {
-        img:"BOSS.png",
-        text:"ガーディアン：その<ruby>言葉<rt>ことば</rt></ruby>が<ruby>真実<rt>しんじつ</rt></ruby>かどうか、私が<ruby>確<rt>たし</rt></ruby>かめてやろう。"
-    },
-    {
-        img:"guardian.png",
-        text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>手<rt>て</rt></ruby>にする<ruby>資格<rt>しかく</rt></ruby>を<ruby>持<rt>も</rt></ruby>つかどうか、<ruby>試練<rt>しれん</rt></ruby>に<ruby>挑<rt>いど</rt></ruby>むがいい！"
-    },
-    {
-        img:"img/orca.png",
-        text:"シャチ：みんな、<ruby>準備<rt>じゅんび</rt></ruby>はいいか！？"
-    },
-    {
-        img:"img/dolphin.png",
-        text:"イルカ：もちろん！"
-    },
-    {
-        img:"img/otter.png",
-        text:"カワウソ：<ruby>負<rt>ま</rt></ruby>けないぞ！"
-    },
-    {
-        img:"BOSS.png",
-        text:"ガーディアン：さあ、<ruby>君<rt>きみ</rt></ruby>たちの<ruby>力<rt>ちから</rt></ruby>を<ruby>見<rt>み</rt></ruby>せてみろ！"
-    }
+eventDone[currentMapIndex] = true;
+fullScreenEvent = true;
+startEvent([
+{
+    img:"img/temple_event.jpg",
+    text:"伝説のおさかなが眠る神殿に到着した。"
+},
+{
+    img:"img/temple_event.jpg",
+    text:"神殿の奥から強大な気配を感じる…。"
+}
 ]);
 
-    break;
-    }
+break;
+}
 }
 function getIceSword(){
 
@@ -782,29 +766,29 @@ function getIceSword(){
 
     hasIceSword = true;
     canFreezeStorm = true;
-
-    startEvent([
+fullScreenEvent = true;
+startEvent([
     {
         img:"img/ice_temple.jpg",
-        text:"吹雪の中で古代の氷の神殿を発見した。"
+        text:"<ruby>吹雪<rt>ふぶき</rt></ruby>の<ruby>中<rt>なか</rt></ruby>で<ruby>古代<rt>こだい</rt></ruby>の<ruby>氷<rt>こおり</rt></ruby>の<ruby>神殿<rt>しんでん</rt></ruby>を<ruby>発見<rt>はっけん</rt></ruby>した。"
     },
     {
         img:"img/ice_sword1.jpg",
-        text:"青く輝く剣が祭壇に刺さっている。"
+        text:"<ruby>青<rt>あお</rt></ruby>く<ruby>輝<rt>かがや</rt></ruby>く<ruby>剣<rt>けん</rt></ruby>が<ruby>祭壇<rt>さいだん</rt></ruby>に<ruby>刺<rt>さ</rt></ruby>さっている。"
     },
     {
         img:"img/ice_sword.jpg",
-        text:"ペンギンはアイスソードを抜いた！"
+        text:"ペンギンはアイスソードを<ruby>抜<rt>ぬ</rt></ruby>いた！"
     },
     {
         img:"img/ice_sword2.jpg",
-        text:"❄️ アイスソードを手に入れた！"
+        text:"❄️ アイスソードを<ruby>手<rt>て</rt></ruby>に<ruby>入<rt>い</rt></ruby>れた！"
     },
     {
         img:"img/ice_sword2.jpg",
-        text:"戦闘中に1回だけ『フリーズストーム』が使えるようになった！"
+        text:"<ruby>戦闘中<rt>せんとうちゅう</rt></ruby>に1<ruby>回<rt>かい</rt></ruby>だけ『フリーズストーム』が<ruby>使<rt>つか</rt></ruby>えるようになった！"
     }
-    ]);
+]);
 }
 function startGame(level) {
 document.querySelector(".crossKey").style.display = "none";
@@ -922,7 +906,7 @@ function toggleSound() {
 
     if (isSoundOn) {
         btn.innerText = "🔊 SOUND ON";
-         fieldBgm.muted = false;
+        fieldBgm.muted = false;
         audio.muted = false;
         bossBgm.muted = false;
         endingBgm.muted = false;
@@ -932,21 +916,31 @@ function toggleSound() {
         seLevel.muted = false;
         seHeal.muted = false;
         guardianBgm.muted = false;
-        
+        seIce.muted = false;
+        seSkill1.muted = false;
+        seSkill2.muted = false;
+        eventBgm.muted = false;
+        innBgm.muted = false;
+
  if(currentMapIndex === 29){guardianBgm.play();}
 
     } else {
         btn.innerText = "🔇 SOUND OFF";
-    fieldBgm.muted = true;
+        fieldBgm.muted = true;
+        eventBgm.muted = true;
         audio.muted = true;
         bossBgm.muted = true;
         endingBgm.muted = true;
-    openingBgm.muted = true;    
+        openingBgm.muted = true;    
         seHit.muted = true;
         seDamage.muted = true;
         seLevel.muted = true;
         seHeal.muted = true;
         guardianBgm.muted = true;
+        seSkill1.muted = true;
+        seSkill2.muted = true;
+        seIce.muted = true;
+        innBgm.muted = true;
     }
 }
 
@@ -984,6 +978,11 @@ function updateMonsterBackground() {
 
         monsterArea.style.backgroundImage =
         "url('bg_snow.jpg')";
+    }
+    else if(currentMapIndex === 29){
+
+        monsterArea.style.backgroundImage =
+        "url('bg_boss.jpg')";
     }
     else{
 
@@ -1180,11 +1179,13 @@ function startEnding(){
 
     endingMode = true;
     endingIndex = 0;
-
+    document.getElementById("skillButtons").style.display = "none";
+    document.getElementById("options").style.display = "none";
     showEndingScene();
 }
 function showEndingScene(){
-
+ document.getElementById("skillButtons").style.display = "none";
+ document.getElementById("options").style.display = "none";
     const scene = endingScenes[endingIndex];
 
     monsterImg.style.display = "none";
@@ -1288,7 +1289,32 @@ function generateMap(index){
 
         map[iy][ix] = 4;
     }
+if(index === 29){
 
+    const bossMap = [
+
+    [1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+    [1,0,0,0,0,5,5,5,5,0,0,0,1],
+
+    [1,0,0,0,0,5,6,6,5,0,0,0,1],
+
+    [1,0,0,0,0,5,6,6,5,0,0,0,1],
+
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1]
+
+    ];
+
+    return bossMap;
+}
     
 
 
@@ -1317,6 +1343,13 @@ playerImgUp.src = "img/hero_up.png";
 
 const playerImgDown = new Image();
 playerImgDown.src = "img/hero_down.png";
+
+const templeImg = new Image();
+templeImg.src = "img/temple.png";
+
+const guardianMapImg = new Image();
+guardianMapImg.src = "guardian_map.png";
+
 function draw(){
 
 
@@ -1335,26 +1368,39 @@ function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // マップ描画
-    for(let y=0; y<map.length; y++){
-        for(let x=0; x<map[y].length; x++){
+ for(let y=0; y<map.length; y++){
+    for(let x=0; x<map[y].length; x++){
 
-            if(map[y][x] === 0)
-                ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        if(map[y][x] === 0)
+            ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
 
-            if(map[y][x] === 1)
-                ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        if(map[y][x] === 1)
+            ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
 
-            if(map[y][x] === 2)
-                ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        if(map[y][x] === 2)
+            ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
 
-            if(map[y][x] === 3)
-                ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
-            if(map[y][x] === 4)
-               ctx.drawImage(innImg,x * tileSize,y * tileSize,tileSize,tileSize
-    );       }
+        if(map[y][x] === 3)
+            ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+        if(map[y][x] === 4)
+            ctx.drawImage(innImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+        if(map[y][x] === 5)
+            ctx.drawImage(templeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+        if(map[y][x] === 6)
+            ctx.drawImage(
+                guardianMapImg,
+                x*tileSize,
+                y*tileSize,
+                tileSize,
+                tileSize
+            );
     }
 
 
+}
 
     // 仲間描画
     for(let i=0;i<party.length;i++){
@@ -1428,7 +1474,8 @@ const heroDown = new Image();
 heroDown.src = "img/hero_down.png";
 
 function movePlayer(dx,dy){
-
+    if(eventMode) return;
+    if(inBattle) return;
     if(dx > 0) direction = "right";
     if(dx < 0) direction = "left";
     if(dy < 0) direction = "up";
@@ -1450,14 +1497,14 @@ if(
 if(
     map[ny][nx] === 0 ||
     map[ny][nx] === 3 ||
-    map[ny][nx] === 4
+    map[ny][nx] === 4 ||
+    map[ny][nx] === 5 ||
+    map[ny][nx] === 6
 ){
-    
-trail.unshift({
+    trail.unshift({
     x: player.x,
     y: player.y
 });
-
 if(trail.length > 100){
     trail.pop();
 }
@@ -1482,6 +1529,7 @@ party.forEach((friend, i) => {
 if(map[player.y][player.x] === 3){
 
     nextArea();
+    return;
 }
 
 if(map[player.y][player.x] === 4){
@@ -1506,8 +1554,52 @@ if(map[player.y][player.x] === 4){
 ){
     getIceSword();
     return;
-}
+}if(map[player.y][player.x] === 6){
+        startBossEvent();
+        return;
+    }
 
+}
+function startBossEvent(){
+
+    if(eventDone["guardian"]) return;
+
+    eventDone["guardian"] = true;
+
+    startBossAfterEvent = true;
+    fieldBgm.pause(); 
+    fieldBgm.currentTime = 0;
+
+    guardianBgm.currentTime = 0;
+    guardianBgm.play();
+
+    startEvent([
+
+        {
+            img:"img/orca.png",
+            text:"シャチ：ん？ みんな、あそこを見て！"
+        },
+        {
+            img:"img/otter.png",
+            text:"カワウソ：どうしたの？"
+        },
+        {
+            img:"img/orca.png",
+            text:"シャチ：<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>にだれかいる！"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：そこで止まれ。"
+        },
+        {
+            img:"BOSS.png",
+            text:"私は<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>守<rt>まも</rt></ruby>るガーディアンだ。"
+        },
+        {
+            img:"BOSS.png",
+            text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを手にする<ruby>資格<rt>しかく</rt></ruby>があるか<ruby>試<rt>ため</rt></ruby>してやろう！"
+        }
+    ]);
 }
 let trail = [];
 let floor = 1;
@@ -1518,12 +1610,23 @@ function visitInn(){
   let maxHp = 200; 
   hp = maxHp;
 
+    fieldBgm.pause();
+    fieldBgm.currentTime = 0;
+    eventBgm.pause();
+    eventBgm.currentTime = 0;
+
+    innEvent = true;
+
+    innBgm.currentTime = 0;
+    innBgm.play();
+
     updateStats();
 
+    fullScreenEvent = true; 
     startEvent([
         {
             img:"img/inn1.jpg",
-            text:"森の中に宿（やど）をみつけた"
+            text:"宿（やど）をみつけた"
         },
         {
             img:"img/inn2.jpg",
@@ -1557,9 +1660,30 @@ function nextArea(){
         location.reload();
         return;
     }
-    triggerAreaEvent();
+
     map = maps[currentMapIndex];
 
+        // 先にリセット
+        player.x = 1;
+        player.y = 1;
+
+        trail = [];
+
+        for(let i = 0; i < (party.length + 1) * 5;
+        i++){
+            trail.push({
+                x: player.x,
+                y: player.y
+            });
+        }
+        party.forEach(friend=>{
+            friend.x = player.x;
+            friend.y = player.y;
+        });
+    triggerAreaEvent();
+    if(eventMode){
+    return;
+    }   
     updateMapTiles();
     updateMonsterBackground();
 
@@ -1620,12 +1744,16 @@ function updateMapTiles(){
         grassImg.src = "img/snow.png";
         treeImg.src = "img/ice.png";
     }
+    else if(currentMapIndex === 29){
+
+        grassImg.src = "img/temple_floor.png";
+        treeImg.src = "img/pillar.png";
+    }
     else{
 
         grassImg.src = "img/demonfloor.png";
         treeImg.src = "img/lava.png";
     }
-
 }
 
 
@@ -1685,15 +1813,15 @@ function getMonsterByLevel() {
 }
 
 
-        if (lv >= 20 && !bossBattle) {
-            bossBattle = true;
-            bossStreak = 0;
+     //   if (lv >= 20 && !bossBattle) {
+     //       bossBattle = true;
+     //       bossStreak = 0;
 
-            document.getElementById('text').innerHTML =
-            "<span style='color:#ff0'>★★★★ 魔王出現！ ★★★★<br>5問連続正解で勝利！</span>";
+     //       document.getElementById('text').innerHTML =
+     //       "<span style='color:#ff0'>★★★★ 魔王出現！ ★★★★<br>5問連続正解で勝利！</span>";
 
-            changeMonster();
-        }
+    //        changeMonster();
+    //    }
 
         if (bossBattle && bossBgm.paused) {
             audio.pause();
@@ -1765,8 +1893,10 @@ ${currentMonsterName}
 
 function getAreaName() {
 
-    if (bossBattle) return "Demon King Castle";
-
+    if (bossBattle) return "Guardian Temple";
+if(currentMapIndex === 29){
+    return "Guardian Temple";
+}
     if(currentMapIndex < 6){
         return "Forest";
     }
@@ -1801,7 +1931,7 @@ function getWinImage(){
     }
 
     else{
-        return "img/demonwin.png";
+        return "img/penguinwin4.png";
     }
 }
 
@@ -2034,7 +2164,7 @@ setTimeout(() => {
 
             textEl.innerHTML =
             `<span style='color:#f00'>
-            魔王の反撃！<br>
+            ガーディアンの反撃！<br>
             正解：${correct}
             </span>`;
 
@@ -2092,7 +2222,10 @@ function getExpReward(){
     return 60;
 }
 function returnToField(){
-
+    winBgm.pause();
+    winBgm.currentTime = 0;
+    fieldBgm.currentTime = 0;
+    fieldBgm.play();
     inBattle = false;
 
     document.querySelector(".crossKey").style.display = "flex";
@@ -2102,9 +2235,6 @@ function returnToField(){
 
     battleBgm.pause();
     bossBgm.pause();
-
-    winBgm.pause();
-    winBgm.currentTime = 0;
 
     if(fieldBgm.paused){
         fieldBgm.currentTime = 0;
@@ -2125,32 +2255,30 @@ function useHeal(){
         return;
     }
 
+    const oldText =
+    document.getElementById("text").innerHTML;
+
     hp = Math.min(hp + 30, 200);
 
-    // 回復SE
     seHeal.currentTime = 0;
     seHeal.play();
 
     updateStats();
 
-
-document.getElementById("text").innerHTML =
-"🦦 カワウソが<ruby>応援<rt>おうえん</rt></ruby>した！<br>HPが30<ruby>回復<rt>かいふく</rt></ruby>した！";
-
-
-
+    document.getElementById("text").innerHTML =
+    "🦦 カワウソが応援した！<br>HPが30回復した！";
 
     canHeal = false;
 
-
-document.getElementById("healBtn").innerHTML =
-"🦦 <ruby>回復<rt>かいふく</rt></ruby> <ruby>使用済<rt>しようずみ</rt></ruby>"
-
+    document.getElementById("healBtn").innerHTML =
+    "🦦 回復 使用済";
 
     document.getElementById("healBtn").disabled = true;
 
-    seHeal.currentTime = 0;
-    seHeal.play();
+    setTimeout(()=>{
+        document.getElementById("text").innerHTML =
+        oldText;
+    },1000);
 }
 function changeQuestionSkill(){
 
@@ -2173,6 +2301,8 @@ document.getElementById("changeBtn").innerHTML =
 
 document.getElementById("text").innerHTML =
 "🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
+    seSkill1.currentTime = 0;
+    seSkill1.play();
     setTimeout(()=>{
         loadQuestion();
     },500);
@@ -2188,6 +2318,8 @@ function useHint(){
         alert("戦闘中のみ使用できます");
         return;
     }
+    seSkill2.currentTime = 0;
+    seSkill2.play();
 
     const buttons =
     document.querySelectorAll("#options button");
@@ -2235,7 +2367,8 @@ function useFreezeStorm(){
     if(!inBattle){
         return;
     }
-
+    seIce.currentTime = 0;   
+    seIce.play();
     canFreezeStorm = false;
 
     document.getElementById("iceBtn").disabled = true;
@@ -2305,12 +2438,12 @@ function pressOK() {
     }
 
     if (battleWin) {
-document.getElementById("options").innerHTML = "";
+    document.getElementById("options").innerHTML = "";
         battleWin = false;
-        changeMonster();
+    
         returnToField();
         winBgm.pause();
-winBgm.currentTime = 0;
+    winBgm.currentTime = 0;
 
     }
 }

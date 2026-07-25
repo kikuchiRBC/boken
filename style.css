@@ -485,7 +485,24 @@ rt{
     height:70px;
     font-size:24px;
 }
+#specialSkill{
+    margin-top:10px;
+    text-align:center;
+}
 
+.iceBtn{
+    background:linear-gradient(
+        #aeefff,
+        #44c8ff
+    );
+    color:white;
+    font-size:26px;
+    font-weight:bold;
+    border:3px solid #ffffff;
+    border-radius:20px;
+    padding:12px 25px;
+    box-shadow:0 0 20px #7ee7ff;
+}
 canvas{
     border:2px solid white;
     max-width:100%;
