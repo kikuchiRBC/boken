@@ -53,11 +53,15 @@
 <div id="field-status">
     <span>⭐LV: <span id="field-lv">1</span></span>
     <span>❤️HP: <span id="field-hp">100</span></span>
+    <span>💰<span id="field-money">0</span>G</span>
     <span>🐧EXP: <span id="field-exp">0</span></span>
     <span>🗺️FLOOR: <span id="field-floor">1</span></span>
 </div>
 
-<canvas id="field" width="400" height="400"></canvas>
+<canvas id="field"
+            width="416"
+            height="416">
+</canvas>
 
 </div>
 
@@ -76,7 +80,6 @@
 
 </div>
 
-</div>
 
 
 
@@ -87,7 +90,8 @@
             <span>HP: <span id="hp">100</span></span>
             <span>EXP: <span id="exp">0</span></span>
         </div>
-        
+
+
 
 <div id="monster-area">
 
@@ -168,7 +172,9 @@
     <audio id="se-hit">
         <source src="audio/se1.mp3" type="audio/mpeg">
     </audio>
-
+<audio id="bgm-shop" loop>
+<source src="audio/shop.mp3" type="audio/mpeg">
+</audio>
     <audio id="se-damage">
         <source src="audio/se2.mp3" type="audio/mpeg">
     </audio>
@@ -177,7 +183,7 @@
         <source src="audio/se_levelup.mp3" type="audio/mpeg">
     </audio>
 
-    <audio id="bgm-boss" loop>
+    <audio id="bgm-boss" loop> 
         <source src="audio/lastboss.mp3" type="audio/mpeg">
     </audio>
     <audio id="bgm-event" loop>
@@ -189,6 +195,10 @@
 
 <audio id="bgm-guardian" loop>
  <source src="audio/guardian.mp3" type="audio/mpeg">   
+</audio>
+
+<audio id="bgm-castle" loop>
+ <source src="audio/castle.mp3" type="audio/mpeg">   
 </audio>
 
 
@@ -209,7 +219,7 @@
         let battleWin = false;
     let isSoundOn = true;
     let eventDone = {};
-    let canHint = false;
+    let hintCount = 0;
     let innEvent = false;
     const endingBgm = document.getElementById("bgm-ending");
     const seHit = document.getElementById("se-hit");
@@ -220,6 +230,7 @@
     const seSkill1 = document.getElementById("se-skill1");
     const seSkill2 = document.getElementById("se-skill2");
     const seIce = document.getElementById("se-ice");
+    const shopBgm =document.getElementById("bgm-shop");
   
     const guardianBgm =document.getElementById("bgm-guardian");
     const openingBgm =document.getElementById("bgm-opening");
@@ -236,13 +247,23 @@ const innBgm = document.getElementById("bgm-inn");
 
 const fieldBgm = document.getElementById("bgm-field");
 const battleBgm = document.getElementById("bgm");
-
+const castleBgm =
+document.getElementById("bgm-castle");
 const winBgm =
 document.getElementById("bgm-win");
 
+const kingImg = new Image();
+kingImg.src = "img/king.png";
+
+const soldierImg = new Image();
+soldierImg.src = "img/soldier.png";
+const chestImg = new Image();
+chestImg.src = "img/chest.png";
+
 const monsterArea =
 document.getElementById("monster-area");
-
+const textEl =
+document.getElementById("text");
         // モンスターの画像リスト
         const monsterImages = [
             "oni.png", // 鬼
@@ -317,15 +338,16 @@ let eventMode = false;
 let eventMessages = [];
 let eventIndex = 0;
 let joinFriend = null
-
-let canHeal = false;
-let canChangeQuestion = false;
-
+let money = 0;
+let healCount = 0;
+let changeCount = 0;
+let maxHp = 200;
 let startBossAfterEvent = false;
 let openingEvent = false;
 let hasIceSword = false;
-let canFreezeStorm = false;
+let freezeCount = 0;
 let fullScreenEvent = false;
+let castleMode = false;
     // イベント
  function startGametitle(){
 
@@ -360,17 +382,22 @@ startEvent([
 ]);
 }
 function startEvent(messages, friend=null){
+
  // 他のBGM停止
+ shopBgm.pause();
+shopBgm.currentTime = 0;
  fieldBgm.pause(); 
  battleBgm.pause(); 
  bossBgm.pause();
+// 城の中以外では城BGMを止める
+if(!castleMode){
+    castleBgm.pause();
+}
 
-
- if(!openingEvent && !innEvent){
+ if(!openingEvent && !innEvent && !castleMode){
     eventBgm.currentTime = 0;
     eventBgm.play();
-}
- 
+ }
 
 document.querySelector(".crossKey").style.display = "none";
     eventMode = true;
@@ -399,13 +426,25 @@ function showEventMessage(){
         document.getElementById("monster-area").style.backgroundImage =
             `url('${msg.img}')`;
 
-    }else{
+}else{
 
-        document.getElementById("monster-img").style.display = "block";
-        document.getElementById("monster-img").src = msg.img;
+    if(castleMode){
+        monsterArea.style.backgroundImage =
+        "url('img/castle_bg.jpg')";
+    }
+    else if(currentMapIndex === 29){
+        monsterArea.style.backgroundImage =
+        "url('img/temple_map_bg.jpg')";
+    }
+    else{
+        updateMonsterBackground();
     }
 
-    document.getElementById("text").innerHTML = msg.text;
+    document.getElementById("monster-img").style.display = "block";
+    document.getElementById("monster-img").src = msg.img;
+}
+
+    textEl.innerHTML = msg.text;
 }
 
 function closeEvent(){
@@ -422,8 +461,15 @@ function closeEvent(){
     eventMode = false;
 
 if(!startBossAfterEvent){
-    fieldBgm.currentTime = 0;
-    fieldBgm.play();
+
+    if(castleMode){
+        castleBgm.currentTime = 0;
+        castleBgm.play();
+    }else{
+        fieldBgm.currentTime = 0;
+        fieldBgm.play();
+    }
+
 }
 
 if(joinFriend && party.length < friendSets.length){
@@ -434,15 +480,15 @@ if(joinFriend && party.length < friendSets.length){
     });
 
     if(joinFriend === "otter"){
-        canHeal = true;
+        healCount = 1;
     }
 
     if(joinFriend === "orca"){
-        canChangeQuestion = true;
+        changeCount = 1;
     }
 
 if(joinFriend === "dolphin"){
-    canHint = true;
+    hintCount = 1;
 }
 
     joinFriend = null;
@@ -453,7 +499,10 @@ if(startBossAfterEvent){
 
 guardianBgm.pause();
 fieldBgm.pause();
+castleBgm.pause();   // ←追加
+
 fieldBgm.currentTime = 0;
+castleBgm.currentTime = 0;
 
 bossBgm.currentTime = 0;
 bossBgm.play();
@@ -462,10 +511,6 @@ bossBgm.play();
      inBattle = true; 
     bossBattle = true;
     bossStreak = 0;
-
-    canHeal = true;
-    canChangeQuestion = true;
-    canHint = true;
 
     document.getElementById("field-screen").style.display = "none";
     document.getElementById("game-container").style.display = "block";
@@ -500,11 +545,16 @@ bossBgm.play();
 document.querySelector(".crossKey").style.display = "flex";
     document.getElementById("game-container").style.display = "none";
     document.getElementById("field-screen").style.display = "block";
+   
+
+if(openingEvent){
     openingEvent = false;
 
-if(openingBgm){
     openingBgm.pause();
     openingBgm.currentTime = 0;
+
+    startCastle();
+    return;
 }
 
 document.getElementById("monster-img").style.display = "block";
@@ -517,6 +567,48 @@ updateFieldStatus();
 draw();
 
 
+}
+function startCastle(){
+fieldBgm.pause();
+openingBgm.pause();
+
+ castleBgm.currentTime = 0;
+ castleBgm.play();
+    castleMode = true;
+
+    map = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,7,0,0,0,0,0,1],
+        [1,0,0,0,8,0,0,0,8,0,0,0,1],
+
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,8,0,0,0,8,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,8,0,0,0,0,0,8,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,3,1,1,1,1,1,1]
+    ];
+
+    player.x = 6;
+    player.y = 7;
+
+    document.getElementById("field-screen").style.display="block";
+trail = [];
+
+for(let i = 0; i < (party.length + 1) * 5; i++){
+    trail.push({
+        x: player.x,
+        y: player.y
+    });
+}
+
+draw();
 }
 function getMonsterEvadeRate(){
 
@@ -765,7 +857,7 @@ function getIceSword(){
     if(hasIceSword) return;
 
     hasIceSword = true;
-    canFreezeStorm = true;
+    freezeCount = 1;
 fullScreenEvent = true;
 startEvent([
     {
@@ -791,10 +883,12 @@ startEvent([
 ]);
 }
 function startGame(level) {
+document.getElementById("monster-img").style.display = "block";
 document.querySelector(".crossKey").style.display = "none";
 document.getElementById("skillButtons").style.display = "none";
 fieldBgm.pause();
-
+shopBgm.pause();
+shopBgm.currentTime = 0;
 battleBgm.currentTime = 0;
 battleBgm.play();
 
@@ -808,13 +902,11 @@ if(hasIceSword){
 
     document.getElementById("iceBtn").style.display = "block";
 
-    document.getElementById("iceBtn").disabled =
-    !canFreezeStorm;
+document.getElementById("iceBtn").disabled =
+freezeCount <= 0;
 
-    document.getElementById("iceBtn").innerHTML =
-    canFreezeStorm
-    ? "❄️ FREEZE STORM"
-    : "❄️ 使用済";
+document.getElementById("iceBtn").innerHTML =
+`❄️ FREEZE (${freezeCount})`;
 
 }else{
 
@@ -829,16 +921,6 @@ if(hasIceSword){
 
     updateMonsterBackground();
 showBattleIntro();
-if(party.length >= 1){
-    canHeal = true;
-}
-
-if(party.length >= 2){
-    canChangeQuestion = true;
-}
-if(party.length >= 3){
-    canHint = true;
-}
 
 document.getElementById("healBtn").style.display =
 party.length >= 1 ? "block" : "none";
@@ -847,12 +929,12 @@ document.getElementById("changeBtn").style.display =
 party.length >= 2 ? "block" : "none";
 
 document.getElementById("healBtn").innerHTML =
-"🦦 回復";
+`🦦 回復 (${healCount})`;
 
 document.getElementById("healBtn").disabled = false;
 
 document.getElementById("changeBtn").innerHTML =
-"🐋 問題変更";
+`🐋 問題変更 (${changeCount})`;
 
 document.getElementById("changeBtn").disabled = false;
 document.getElementById("hintBtn").style.display =
@@ -861,7 +943,7 @@ document.getElementById("iceBtn").style.display =
 hasIceSword ? "block" : "none";
 
 document.getElementById("hintBtn").innerHTML =
-"🐬 2択ヒント";
+`🐬 ヒント (${hintCount})`;
 
 document.getElementById("hintBtn").disabled = false;
 
@@ -906,6 +988,7 @@ function toggleSound() {
 
     if (isSoundOn) {
         btn.innerText = "🔊 SOUND ON";
+        castleBgm.muted = false;
         fieldBgm.muted = false;
         audio.muted = false;
         bossBgm.muted = false;
@@ -921,11 +1004,12 @@ function toggleSound() {
         seSkill2.muted = false;
         eventBgm.muted = false;
         innBgm.muted = false;
-
+        shopBgm.muted = false;
  if(currentMapIndex === 29){guardianBgm.play();}
 
     } else {
         btn.innerText = "🔇 SOUND OFF";
+        castleBgm.muted = true;
         fieldBgm.muted = true;
         eventBgm.muted = true;
         audio.muted = true;
@@ -941,6 +1025,7 @@ function toggleSound() {
         seSkill2.muted = true;
         seIce.muted = true;
         innBgm.muted = true;
+        shopBgm.muted = true;
     }
 }
 
@@ -951,11 +1036,23 @@ function shakeMonster() {
 }
 
 function updateMonsterBackground() {
+// お城にいる場合
+if(castleMode){
+monsterArea.style.backgroundImage =
+"url('img/castle_bg.jpg')";
+return;
+}
 
+// 神殿
+if(currentMapIndex === 29){
+monsterArea.style.backgroundImage =
+"url('img/temple_map_bg.jpg')";
+return;
+}
     if(bossBattle){
 
         monsterArea.style.backgroundImage =
-        "url('bg_boss.jpg')";
+        "url('img/temple_map_bg.jpg')";
         return;
     }
 
@@ -1127,6 +1224,8 @@ const player = {
 let hp = 100;
 let inBattle = false;
 
+let kingTalkCount = 0;
+
 const grassImg = new Image();
 grassImg.src = "img/grass.png";
 
@@ -1158,6 +1257,20 @@ riverImg.src = "img/river.png";
 const innImg = new Image();
 innImg.src = "img/inn.png";
 
+const castleFloorImg = new Image();
+castleFloorImg.src = "img/castle_floor.png";
+
+const castleWallImg = new Image();
+castleWallImg.src = "img/castle_wall.png";
+
+const castleKingImg = new Image();
+castleKingImg.src = "img/king.png";
+
+const castleBgImg = new Image();
+castleBgImg.src = "img/castle_bg.png";
+
+const shopImg = new Image();
+shopImg.src = "img/shop.png";
 
 
 const canvas = document.getElementById("field");
@@ -1196,7 +1309,7 @@ function showEndingScene(){
     monsterArea.style.backgroundSize = "cover";
     monsterArea.style.backgroundPosition = "center";
 
-    document.getElementById("text").innerHTML =
+    textEl.innerHTML =
         scene.text;
 
     document.getElementById("options").innerHTML =
@@ -1208,7 +1321,7 @@ function nextEnding(){
 
     if(endingIndex >= endingScenes.length){
 
-        document.getElementById("text").innerHTML =
+        textEl.innerHTML =
         "ありがとうございました！";
 
         document.getElementById("options").innerHTML =
@@ -1260,19 +1373,47 @@ function generateMap(index){
         }
     }
 
-    // 階段配置
-    let sx, sy;
+// 階段配置
+let sx, sy;
+
+do{
+    sx = Math.floor(Math.random()*11)+1;
+    sy = Math.floor(Math.random()*11)+1;
+}
+while(map[sy][sx] !== 0);
+
+map[sy][sx] = 3;
+
+// ショップ配置
+
+if(index < 29 && Math.random() < 0.3){
+
+    let shopX, shopY;
 
     do{
+        shopX = Math.floor(Math.random()*11)+1;
+        shopY = Math.floor(Math.random()*11)+1;
+    }
+    while(map[shopY][shopX] !== 0);
 
-        sx = Math.floor(Math.random()*11)+1;
-        sy = Math.floor(Math.random()*11)+1;
+    map[shopY][shopX] = 9;
+}
+// 宝箱配置
+const chestCount =
+Math.floor(Math.random() * 3) + 1; // 1～3個
 
-    }while(map[sy][sx] !== 0);
+for(let i=0; i<chestCount; i++){
 
+    let cx, cy;
 
-    map[sy][sx] = 3;
+    do{
+        cx = Math.floor(Math.random()*11)+1;
+        cy = Math.floor(Math.random()*11)+1;
+    }
+    while(map[cy][cx] !== 0);
 
+    map[cy][cx] = 10;
+}
     // 5階ごとに宿配置
     if(
         (index + 1) % 5 === 0 &&
@@ -1294,20 +1435,16 @@ if(index === 29){
     const bossMap = [
 
     [1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,1,0,1,0,1,0,0,0,1],
+    [1,0,0,0,1,0,6,0,1,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,1,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-    [1,0,0,0,0,5,5,5,5,0,0,0,1],
-
-    [1,0,0,0,0,5,6,6,5,0,0,0,1],
-
-    [1,0,0,0,0,5,6,6,5,0,0,0,1],
-
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,1,0,0,0,1,0,0,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1]
 
@@ -1368,37 +1505,106 @@ function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     // マップ描画
- for(let y=0; y<map.length; y++){
+for(let y=0; y<map.length; y++){
     for(let x=0; x<map[y].length; x++){
 
-        if(map[y][x] === 0)
-            ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
+// 城マップ
+if(castleMode){
 
-        if(map[y][x] === 1)
-            ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-        if(map[y][x] === 2)
-            ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-        if(map[y][x] === 3)
-            ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-        if(map[y][x] === 4)
-            ctx.drawImage(innImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-        if(map[y][x] === 5)
-            ctx.drawImage(templeImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-        if(map[y][x] === 6)
-            ctx.drawImage(
-                guardianMapImg,
-                x*tileSize,
-                y*tileSize,
-                tileSize,
-                tileSize
-            );
+    if(y === 0 && x === 0){
+        ctx.drawImage(
+            castleBgImg,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
     }
 
+    // 王様
+    if(map[y][x] === 7){
+        ctx.drawImage(
+            castleKingImg,
+            x * tileSize,
+            y * tileSize,
+            tileSize,
+            tileSize
+        );
+    }
+
+    // 兵士
+    if(map[y][x] === 8){
+        ctx.drawImage(
+            soldierImg,
+            x * tileSize,
+            y * tileSize,
+            tileSize,
+            tileSize
+        );
+    }
+
+    // 階段
+    if(map[y][x] === 3){
+        ctx.drawImage(
+            stairsImg,
+            x * tileSize,
+            y * tileSize,
+            tileSize,
+            tileSize
+        );
+    }
+
+    continue;
+}
+
+if(map[y][x] === 0)
+    ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 1)
+    ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 2)
+    ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 3)
+    ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 4)
+    ctx.drawImage(innImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 5)
+    ctx.drawImage(templeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+
+if(map[y][x] === 6)
+    ctx.drawImage(
+        guardianMapImg,
+        x*tileSize,
+        y*tileSize,
+        tileSize*2,
+        tileSize*2
+    );
+if(map[y][x] === 9)
+ctx.drawImage( shopImg, x * tileSize, y * tileSize, tileSize,tileSize 
+
+);
+if(map[y][x] === 10){
+    ctx.drawImage(
+        grassImg,
+        x*tileSize,
+        y*tileSize,
+        tileSize,
+        tileSize
+    );
+
+    ctx.drawImage(
+        chestImg,
+        x*tileSize,
+        y*tileSize,
+        tileSize,
+        tileSize
+    );
+}
+}
 
 }
 
@@ -1473,6 +1679,28 @@ heroUp.src = "img/hero_up.png";
 const heroDown = new Image();
 heroDown.src = "img/hero_down.png";
 
+function openChest(){
+
+    const gold =
+    Math.floor(Math.random() * 500) + 1;
+
+    money += gold;
+
+    startEvent([
+                {
+            img:"img/chest.png",
+            text:`宝箱がある`
+        },
+        {
+            img:"img/chest1.png",
+            text:`宝箱を開けた！<br>💰 ${gold}G を手に入れた！`
+        }
+    ]);
+
+    map[player.y][player.x] = 0;
+
+    updateFieldStatus();
+}
 function movePlayer(dx,dy){
     if(eventMode) return;
     if(inBattle) return;
@@ -1499,7 +1727,11 @@ if(
     map[ny][nx] === 3 ||
     map[ny][nx] === 4 ||
     map[ny][nx] === 5 ||
-    map[ny][nx] === 6
+    map[ny][nx] === 6 ||
+    map[ny][nx] === 7 ||
+    map[ny][nx] === 8 ||
+    map[ny][nx] === 9||
+    map[ny][nx] === 10
 ){
     trail.unshift({
     x: player.x,
@@ -1527,25 +1759,61 @@ party.forEach((friend, i) => {
 }
 
 if(map[player.y][player.x] === 3){
+if(castleMode){
+castleBgm.pause();
+castleBgm.currentTime = 0;
+    castleMode = false;
 
+    currentMapIndex = 0;
+    map = maps[0];
+
+    player.x = 1;
+    player.y = 1;
+
+    updateMapTiles();
+    draw();
+
+    fieldBgm.currentTime = 0;
+    fieldBgm.play();
+
+    return;
+}
     nextArea();
     return;
 }
 
 if(map[player.y][player.x] === 4){
     visitInn();
-     draw();
-        return;   // ←追加
+    return;
+}
+
+if(map[player.y][player.x] === 9){
+    visitShop();
+    return;
 }
     draw();
 
-    if(!inBattle){
-        let encounterRate = Math.random();
+// 階段・宿・ショップ・宝箱・イベントマスでは戦闘しない
+const tile = map[player.y][player.x];
 
-        if(encounterRate < 0.08){
-            startGame('N2');
-        }
+if(
+    !castleMode &&
+    !inBattle &&
+    tile !== 3 &&   // 階段
+    tile !== 4 &&   // 宿
+    tile !== 9 &&   // ショップ
+    tile !== 10 &&  // 宝箱
+    tile !== 6 &&   // ガーディアン
+    tile !== 7 &&   // 王様
+    tile !== 8      // 兵士
+){
+    if(Math.random() < 0.08){
+        startGame("N2");
     }
+}
+
+
+
     if(
     currentMapIndex >= 18 &&
     currentMapIndex < 24 &&
@@ -1558,7 +1826,230 @@ if(map[player.y][player.x] === 4){
         startBossEvent();
         return;
     }
+        if(map[player.y][player.x] === 10){
+    openChest();
+    return;
+     }
 
+if(map[player.y][player.x] === 8){
+    startEvent([
+        {
+            img:"img/soldier.png",
+            text:"兵士：王様をお守りしています！"
+        }
+    ]);
+    return;
+    }
+
+    if(map[player.y][player.x] === 7){
+
+    kingTalkCount++;
+
+    if(kingTalkCount < 5){
+
+        startEvent([
+            {
+                img:"img/king_event.png",
+                text:`<ruby>王様<rt>おうさま</rt></ruby>：ペンギンよ。 `
+            },
+            {
+                img:"img/king_event.png",
+                text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを見つけ、<ruby>世界<rt>せかい</rt></ruby>を<ruby>救<rt>すく</rt></ruby>ってほしい。"
+            },
+                       {
+                img:"img/king_event.png",
+                text:"<ruby>頼<rt>たの</rt></ruby>んだぞ！"
+            }
+        ]);
+
+    }else{
+
+        startEvent([
+            {
+                img:"img/king_event.png",
+                text:"<ruby>王様<rt>おうさま</rt></ruby>：<ruby>何回<rt>なんかい</rt></ruby>、話しかけるつもりなのだ"
+            },
+            {
+                img:"img/king_event.png",
+                text:"よろしい、ではお<ruby>前<rt>まえ</rt></ruby>の<ruby>力<rt>ちから</rt></ruby>を<ruby>試<rt>ため</rt></ruby>してやろう！"
+            }
+        ]);
+
+        kingTalkCount = 0;
+
+        kingBattle = true; 
+        startBossAfterEvent = true;
+    }
+ return;
+}
+
+
+    //map[player.y][player.x] = 0;
+}
+function shopMsg(msg){
+    textEl.innerHTML =
+    `🛒 いらっしゃいませ！<br>
+    所持金：${money}G<br><br>
+    ${msg}`;
+}
+function buyItem(type){
+
+    if(type==="heal"){
+
+        if(healCount <= 0){
+            shopMsg("カワウソが仲間にいません");
+            return;
+        }
+
+        if(money < 300){
+            shopMsg("お金が足りません");
+            return;
+        }
+
+        money -= 300;
+        healCount++;
+        shopMsg("🦦 回復を購入しました！");
+    }
+
+    else if(type==="change"){
+
+        if(changeCount <= 0){
+            shopMsg("シャチが仲間にいません");
+            return;
+        }
+
+        if(money < 500){
+            shopMsg("お金が足りません");
+            return;
+        }
+
+        money -= 500;
+        changeCount++;
+shopMsg("🐋 問題変更を購入しました！");
+
+    }
+
+    else if(type==="hint"){
+
+        if(hintCount <= 0){
+            shopMsg("イルカが仲間にいません");
+            return;
+        }
+
+        if(money < 500){
+            shopMsg("お金が足りません");
+            return;
+        }
+
+        money -= 500;
+     hintCount++;
+        shopMsg("🐬 ヒントを購入しました！");
+    }
+
+    else if(type==="freeze"){
+
+        if(!hasIceSword){
+            shopMsg("アイスソードを持っていません");
+            return;
+        }
+
+        if(money < 1000){
+            shopMsg("お金が足りません");
+            return;
+        }
+
+        money -= 1000;
+     freezeCount++;
+ shopMsg("❄️ FREEZEを購入しました！");
+    }
+
+    updateFieldStatus();
+    setTimeout(()=>{
+        showShopMenu();
+         },100);
+}
+function closeShop(){
+
+    shopBgm.pause();
+    shopBgm.currentTime = 0;
+
+    if(castleMode){
+        castleBgm.play();
+    }else{
+        fieldBgm.play();
+    }
+
+    document.getElementById("monster-img").style.display = "block";
+
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("options").style.display = "none";
+
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("field-screen").style.display = "block";
+
+    updateMonsterBackground();
+    draw();
+}
+function visitShop(){
+
+    fieldBgm.pause();
+    battleBgm.pause();
+    eventBgm.pause();
+    castleBgm.pause();
+
+    shopBgm.currentTime = 0;
+    shopBgm.play();
+
+    document.getElementById("field-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+
+    document.getElementById("skillButtons").style.display = "none";
+
+    monsterArea.style.backgroundImage =
+    "url('img/shop_bg.jpg')";
+
+    document.getElementById("monster-img").style.display = "none";
+
+    textEl.innerHTML =
+    `🛒 いらっしゃいませ！<br>
+    所持金：${money}G`;
+
+    showShopMenu();
+
+    map[player.y][player.x] = 0;
+}
+function showShopMenu(){
+
+    const options =
+    document.getElementById("options");
+
+    options.style.display = "grid";
+
+    options.innerHTML = `
+  <button onclick="buyItem('heal')"class="shopBtn">
+        <img src="img/items/hotate_cookie.png" alt="ホタテクッキー">
+        🦦 ホタテクッキー ☆ 回復スキル+1 (300G)
+    </button>
+
+        <button onclick="buyItem('change')"class="shopBtn">
+            <img src="img/items/magurosoda.png" alt="マグロソーダ">
+        🐋 マグロソーダ☆問題変更スキル+1 (500G)
+        </button>
+
+        <button onclick="buyItem('hint')"class="shopBtn">
+            <img src="img/items/compus.png" alt="銀色コンパス">
+        🐬 銀色コンパス☆ヒントスキル+1 (500G)
+        </button>
+
+        <button onclick="buyItem('freeze')"class="shopBtn">
+            <img src="img/items/ice.png" alt="氷の結晶">
+        ❄️ 氷の結晶☆FREEZEスキル+1 (1000G)
+        </button>
+
+        <button onclick="closeShop()">
+        おみせを出る
+        </button>
+    `;
 }
 function startBossEvent(){
 
@@ -1607,7 +2098,6 @@ let floor = 1;
 
 function visitInn(){
 
-  let maxHp = 200; 
   hp = maxHp;
 
     fieldBgm.pause();
@@ -1794,7 +2284,7 @@ function getMonsterByLevel() {
         
         exp -= 300;
         lv++;
-        hp = Math.min(hp + 30, 200);
+        hp = Math.min(hp + 30, maxHp);
 
         seLevel.currentTime = 0;
         seLevel.play();
@@ -1832,7 +2322,6 @@ function getMonsterByLevel() {
 
     // ✅ ★これをここに入れる（超重要）
     updateMonsterBackground();
-　
     document.getElementById('hp').innerText = hp;
     document.getElementById('exp').innerText = exp;
     document.getElementById('lv').innerText = lv;
@@ -1846,17 +2335,24 @@ function updateFieldStatus(){
     document.getElementById("field-hp").textContent = hp;
     document.getElementById("field-exp").textContent = exp;
     document.getElementById("field-floor").textContent = floor;
-
+    document.getElementById("field-money").textContent = money;
 }
-    
+    let kingBattle = false;
         // 新しいモンスターを出す関数
         function changeMonster() {
 
 monsterImg.style.display = "block";
 
+
     if (bossBattle) {
-        monsterImg.src = bossImage;
-        monsterImg.classList.add("float"); // ✅これ追加
+
+        if(kingBattle){
+            monsterImg.src = "img/king.png";
+        }else{
+            monsterImg.src = bossImage; // ガーディアン
+        }
+
+        monsterImg.classList.add("float");
         return;
     }
 
@@ -1871,7 +2367,7 @@ monsterNames[newMonster] || "なぞのモンスター";
 
         monsterImg.src = newMonster;
 
-document.getElementById("text").innerHTML =
+textEl.innerHTML =
 `
 ${currentMonsterName}
 が<ruby>前<rt>まえ</rt></ruby>に
@@ -1893,7 +2389,14 @@ ${currentMonsterName}
 
 function getAreaName() {
 
-    if (bossBattle) return "Guardian Temple";
+    if (bossBattle){
+
+    if(kingBattle){
+        return "King Castle";
+    }
+
+    return "Guardian Temple";
+}
 if(currentMapIndex === 29){
     return "Guardian Temple";
 }
@@ -1941,246 +2444,294 @@ function getWinImage(){
 
 function loadQuestion() {
 
-    document.getElementById('area-name').innerText = getAreaName();
+    const optionsDiv =
+    document.getElementById("options");
+
+    optionsDiv.style.display = "grid";
+
+    document.getElementById('area-name').innerText =
+    getAreaName();
 
     const list = questions2;
 
     const qData =
     list[Math.floor(Math.random() * list.length)];
 
-
     currentAnswer = qData.a;
-const imgEl = document.getElementById("question-image");
 
-if(qData.img){
+    const imgEl =
+    document.getElementById("question-image");
 
-    imgEl.src = qData.img;
-    imgEl.style.display = "block";
+    if(qData.img){
+        imgEl.src = qData.img;
+        imgEl.style.display = "block";
+    }else{
+        imgEl.style.display = "none";
+    }
 
-}else{
+    textEl.innerHTML =
+    `<b></b><br>${qData.q}`;
 
-    imgEl.style.display = "none";
-
-}
-    document.getElementById('text').innerHTML =
-        `<b></b><br>${qData.q}`;
-
-    const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
 
-    qData.ops.sort(() => Math.random() - 0.5).forEach(op => {
-        const btn = document.createElement('button');
+    qData.ops
+        .sort(() => Math.random() - 0.5)
+        .forEach(op => {
+
+        const btn =
+        document.createElement('button');
+
         btn.innerHTML = op;
-        btn.onclick = () => checkAnswer(op, qData.a);
+        btn.onclick = () =>
+            checkAnswer(op, qData.a);
+
         optionsDiv.appendChild(btn);
     });
 }
-
-
+  
 function checkAnswer(selected, correct) {
 
-    const textEl = document.getElementById('text');
+    const textEl = document.getElementById("text");
 
-    // ✅ 正解
+    // ========================================
+    // 正解
+    // ========================================
     if (selected === correct) {
 
         playHitEffect();
-shakeMonster();
-        // ✅ モンエネ処理
-        if (isPotion) {
-
-            hp = Math.min(hp + 30, 200);
-
-            textEl.innerHTML =
-            "<span style='color:#0ff'>モンエネを飲んだ！HP回復！</span>";
-
-            seHeal.currentTime = 0;
-            seHeal.play();
-
-            isPotion = false;
-
-        } else {
+        shakeMonster();
 
 
-            // ✅ ボス戦
-            if (bossBattle) {
+        // ========================================
+        // ボス戦
+        // ========================================
+        if (bossBattle) {
 
-                bossStreak++;
+            bossStreak++;
 
-                // ✅ 5連続でエンディング
-                if (bossStreak >= 5) {
-                    // BGM停止
-                    audio.pause();
-                    bossBgm.pause();
 
-                    // エンディングBGM
-                    endingBgm.currentTime = 0;
-                    endingBgm.play();
-startEnding();   
-return;
-                    // 画像
+            // ----------------------------------------
+            // 5問連続正解
+            // ----------------------------------------
+            if (bossStreak >= 5) {
+
+                // ====================================
+                // 王様戦クリア
+                // ====================================
+                if (kingBattle) {
+                    exp += 500;   // ←経験値500追加
+                    kingBattle = false;
+                    bossBattle = false;
+                    bossStreak = 0;
+                    inBattle = false;
                     
-monsterImg.style.display = "none";
-monsterArea.style.backgroundImage =
-    `url('${ending.img}')`;
-
-monsterArea.style.height = "300px";
-monsterArea.style.backgroundSize = "cover";
-monsterArea.style.backgroundPosition = "center";
+                    updateStats(); 
 
 
-                    // メッセージ
-                    textEl.innerHTML = `
-                        <span style='color:#ff0'>
-                        ★★★★★ クリア！ ★★★★★<br>
-                        ${ending.text}
-                        </span>`;
+                    bossBgm.pause();
+                    bossBgm.currentTime = 0;
 
-                    // ボタン
-                    document.getElementById("options").innerHTML =
-                        '<button onclick="location.reload()">もう一度遊ぶ</button>';
+                    startEvent([
+                        {
+                            img: "img/king_event.png",
+                            text: "<ruby>王様<rt>おうさま</rt></ruby>：<ruby>見事<rt>みごと</rt></ruby>だ！<ruby>経験値<rt>けいけんち</rt></ruby>を500アップさせてやろう"
+                        },
+                        {
+                            img: "img/king_event.png",
+                            text: "<ruby>王様<rt>おうさま</rt></ruby>：これで<ruby>安心<rt>あんしん</rt></ruby>して<ruby>冒険<rt>ぼうけん</rt></ruby>を<ruby>任<rt>まか</rt></ruby>せられる。"
+                        }
+                    ]);
 
                     return;
                 }
 
-                // ✅ ボスダメージ表示
-                textEl.innerHTML =
-                `<span style='color:#ff0'>
-                ガーディアンにダメージ！<br>
-                ${bossStreak}/5
+
+                // ====================================
+                // ガーディアン戦クリア
+                // ====================================
+                audio.pause();
+                audio.currentTime = 0;
+
+                bossBgm.pause();
+                bossBgm.currentTime = 0;
+
+                endingBgm.currentTime = 0;
+                endingBgm.play();
+
+                startEnding();
+
+                return;
+            }
+
+
+            // ----------------------------------------
+            // ボスにダメージ
+            // ----------------------------------------
+            textEl.innerHTML =
+                `<span style="color:#ff0">
+                    ${kingBattle ? "王様" : "ガーディアン"}にダメージ！<br>
+                    ${bossStreak}/5
                 </span>`;
-
-                
-setTimeout(() => {
-    loadQuestion();
-}, 1200);
-return;
-
- 
-} else {
-    const hitRate = getHitRate();
-
-if(Math.random() > hitRate){
-
-    document.getElementById("text").innerHTML =
-    `
-  
-<span style="color:#ff0">
-    <ruby>正解<rt>せいかい</rt></ruby>した！<br>
-    しかし<ruby>相手<rt>あいて</rt></ruby>は<ruby>納得<rt>なっとく</rt></ruby>しない！
-</span>
-
-    `;
-
-    setTimeout(()=>{
-        loadQuestion();
-    },1200);
-
-    return;
-}
-    exp += getExpReward();
-
-    battleWin = true;
-battleBgm.pause();
-bossBgm.pause();
-
-seDamage.currentTime = 0;
-seDamage.play();
-updateStats();
-setTimeout(() => {
-
-    winBgm.currentTime = 0;
-    winBgm.play();
-
-}, 500);
-
-
-textEl.innerHTML = `
-<span style="color:#0f0">
-せいかい！${currentMonsterName} は納得した！<br>
-<ruby>経験値<rt>けいけんち</rt></ruby>を
-${getExpReward()}
-<ruby>獲得<rt>かくとく</rt></ruby>！
-</span>
-`;
-
-
-    document.getElementById("monster-img").style.display="none";
-
-
-
-document.getElementById("skillButtons").style.display = "none";
-
-
-document.getElementById("options").innerHTML =
-`
-<img src="${getWinImage()}" class="win-image float">
-`;
-
-    updateStats();
-
-    return;
-
-}
-
 
             seHit.currentTime = 0;
             seHit.play();
-        }
 
-    // ❌ 不正解
-    } else {
-
-        // ✅ モンエネ逃げ
-        if (isPotion) {
-
-            textEl.innerHTML =
-            "<span style='color:#0ff'>モンエネは逃げてしまった！</span>";
-
-            isPotion = false;
-
-            returnToField();
-
-updateStats();
-setTimeout(() => {
-    loadQuestion();
-}, 1200)
+            setTimeout(() => {
+                loadQuestion();
+            }, 1200);
 
             return;
         }
 
-        // ダメージ演出
-        document.body.style.background = "#400";
 
+        // ========================================
+        // 通常モンスター戦
+        // ========================================
+
+        const hitRate = getHitRate();
+
+
+        // ----------------------------------------
+        // 正解したけど攻撃が外れる
+        // ----------------------------------------
+        if (Math.random() > hitRate) {
+
+            textEl.innerHTML =
+                `
+                <span style="color:#ff0">
+                    <ruby>正解<rt>せいかい</rt></ruby>した！<br>
+                    しかし<ruby>相手<rt>あいて</rt></ruby>は
+                    <ruby>納得<rt>なっとく</rt></ruby>しない！
+                </span>
+                `;
+
+            setTimeout(() => {
+                loadQuestion();
+            }, 1200);
+
+            return;
+        }
+
+
+        // ========================================
+        // 通常モンスター撃破
+        // ========================================
+
+        const reward = getExpReward();
+
+        exp += reward;
+
+        battleWin = true;
+
+        battleBgm.pause();
+        bossBgm.pause();
+
+        seDamage.currentTime = 0;
+        seDamage.play();
+
+
+        // 経験値・レベル更新
+        updateStats();
+
+
+        // 勝利BGM
         setTimeout(() => {
-            document.body.style.background = "#0078cd";
-        }, 200);
+
+            winBgm.currentTime = 0;
+            winBgm.play();
+
+        }, 500);
+
+
+        textEl.innerHTML =
+            `
+            <span style="color:#0f0">
+                せいかい！
+                ${currentMonsterName} は納得した！<br>
+
+                <ruby>経験値<rt>けいけんち</rt></ruby>を
+                ${reward}
+                <ruby>獲得<rt>かくとく</rt></ruby>！
+            </span>
+            `;
+
+
+        // モンスターを消す
+        document.getElementById("monster-img").style.display = "none";
+
+
+        // スキルボタンを消す
+        document.getElementById("skillButtons").style.display = "none";
+
+
+        // 勝利画像
+        document.getElementById("options").innerHTML =
+            `
+            <img
+                src="${getWinImage()}"
+                class="win-image float"
+            >
+            `;
+
+
+        updateStats();
+
+        return;
+    }
+
+
+    // ========================================
+    // 不正解
+    // ========================================
+    else {
+monsterArea.classList.remove("damageFlash");
+void monsterArea.offsetWidth;
+monsterArea.classList.add("damageFlash");
 
         hp -= 5;
 
+
+        // ========================================
+        // ボス戦の反撃
+        // ========================================
         if (bossBattle) {
 
             bossStreak = 0;
 
             textEl.innerHTML =
-            `<span style='color:#f00'>
-            ガーディアンの反撃！<br>
-            正解：${correct}
-            </span>`;
+                `
+                <span style="color:#f00">
+                    ${kingBattle ? "王様" : "ガーディアン"}の反撃！<br>
+                    正解：${correct}
+                </span>
+                `;
 
-        } else {
-
-            textEl.innerHTML =
-            `<span style='color:#f00'>
-            ミス！5ダメージ<br>
-            正解：${correct}
-            </span>`;
         }
 
+
+        // ========================================
+        // 通常戦
+        // ========================================
+        else {
+
+            textEl.innerHTML =
+                `
+                <span style="color:#f00">
+                    ミス！5ダメージ<br>
+                    正解：${correct}
+                </span>
+                `;
+        }
+
+
+        // ダメージSE
         seDamage.currentTime = 0;
         seDamage.play();
 
-        // ✅ ゲームオーバー
+
+        // ========================================
+        // ゲームオーバー
+        // ========================================
         if (hp <= 0) {
 
             alert("目の前が真っ暗になった...");
@@ -2188,29 +2739,38 @@ setTimeout(() => {
             hp = 100;
             exp = 0;
             lv = 1;
+
             bossBattle = false;
+            kingBattle = false;
             bossStreak = 0;
+            inBattle = false;
 
             bossBgm.pause();
-            audio.play();
+            bossBgm.currentTime = 0;
+
+            audio.pause();
+            audio.currentTime = 0;
 
             returnToField();
-             return;
+
+            return;
         }
-        
-updateStats();
 
-setTimeout(() => {
-    loadQuestion();
-}, 1200);
 
-return;
+        // ステータス更新
+        updateStats();
 
+
+        // 次の問題
+        setTimeout(() => {
+            loadQuestion();
+        }, 1200);
+
+        return;
     }
-
-  
-    
 }
+    
+
 
 function getExpReward(){
 
@@ -2241,11 +2801,13 @@ function returnToField(){
         fieldBgm.play();
     }
 }
-   draw();
+  window.onload = () => {
+    draw();
+};
  
 function useHeal(){
 
-    if(!canHeal){
+    if(healCount <= 0){
         alert("回復は使えません");
         return;
     }
@@ -2256,33 +2818,33 @@ function useHeal(){
     }
 
     const oldText =
-    document.getElementById("text").innerHTML;
+    textEl.innerHTML;
 
-    hp = Math.min(hp + 30, 200);
+   hp = Math.min(hp + 30, maxHp);
 
     seHeal.currentTime = 0;
     seHeal.play();
 
     updateStats();
 
-    document.getElementById("text").innerHTML =
+    textEl.innerHTML =
     "🦦 カワウソが応援した！<br>HPが30回復した！";
 
-    canHeal = false;
+    healCount--;
 
     document.getElementById("healBtn").innerHTML =
-    "🦦 回復 使用済";
+`🦦 回復 (${healCount})`;
 
     document.getElementById("healBtn").disabled = true;
 
     setTimeout(()=>{
-        document.getElementById("text").innerHTML =
+        textEl.innerHTML =
         oldText;
     },1000);
 }
 function changeQuestionSkill(){
 
-    if(!canChangeQuestion){
+    if(changeCount <= 0){
         alert("問題変更は使えません");
         return;
     }
@@ -2292,14 +2854,13 @@ function changeQuestionSkill(){
         return;
     }
 
-    canChangeQuestion = false;
-
+   changeCount--;
     document.getElementById("changeBtn").disabled = true;
 
 document.getElementById("changeBtn").innerHTML =
-"🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby> <ruby>使用済<rt>しようずみ</rt></ruby>";
+`🐋 問題変更 (${changeCount})`;
 
-document.getElementById("text").innerHTML =
+textEl.innerHTML =
 "🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
     seSkill1.currentTime = 0;
     seSkill1.play();
@@ -2309,7 +2870,7 @@ document.getElementById("text").innerHTML =
 }
 function useHint(){
 
-    if(!canHint){
+    if(hintCount <= 0){
         alert("ヒントは使えません");
         return;
     }
@@ -2337,30 +2898,34 @@ function useHint(){
 wrongButtons.sort(()=>Math.random()-0.5);
 
 // 不正解を2つ消す
-wrongButtons[0].style.display = "none";
-wrongButtons[1].style.display = "none";
+if(wrongButtons[0]){
+    wrongButtons[0].style.display = "none";
+}
 
-canHint = false;
+if(wrongButtons[1]){
+    wrongButtons[1].style.display = "none";
+}
+hintCount--;
 
 document.getElementById("hintBtn").innerHTML =
-"🐬 2択ヒント 使用済";
+`🐬 ヒント (${hintCount})`;
 
 document.getElementById("hintBtn").disabled = true;
 
 const oldQuestion =
-document.getElementById("text").innerHTML;
+textEl.innerHTML;
 
-document.getElementById("text").innerHTML =
+textEl.innerHTML =
 "🐬 イルカがヒントをくれた！";
 
 setTimeout(()=>{
-    document.getElementById("text").innerHTML =
+    textEl.innerHTML =
     oldQuestion;
 },1000);
 }
 function useFreezeStorm(){
 
-    if(!canFreezeStorm){
+    if(freezeCount <= 0){
         return;
     }
 
@@ -2369,13 +2934,13 @@ function useFreezeStorm(){
     }
     seIce.currentTime = 0;   
     seIce.play();
-    canFreezeStorm = false;
+    freezeCount--;
 
     document.getElementById("iceBtn").disabled = true;
-    document.getElementById("iceBtn").innerHTML =
-    "❄️ 使用済";
+  document.getElementById("iceBtn").innerHTML =
+`❄️ FREEZE (${freezeCount})`;
 
-    document.getElementById("text").innerHTML =
+    textEl.innerHTML =
     `
     ❄️ フリーズストーム発動！
     <br>
@@ -2396,7 +2961,7 @@ function useFreezeStorm(){
         document.getElementById("skillButtons").style.display =
         "none";
 
-        document.getElementById("text").innerHTML =
+        textEl.innerHTML =
         `
         <span style="color:#8ff">
         氷の力で敵を説得した！
@@ -2451,7 +3016,16 @@ function regenerateMap(){
 
     // 戦闘中は使えない
     if(inBattle) return;
-
+// お城では使えない
+if(castleMode){
+        alert("お城ではMAPreloadできません");
+        return;
+}
+// ボスマップでは使えない
+if(currentMapIndex === 29){
+    alert("神殿ではMAPreloadできません");
+    return;
+}
    maps[currentMapIndex] = generateMap(currentMapIndex);
 
     map = maps[currentMapIndex];

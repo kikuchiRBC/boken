@@ -331,7 +331,21 @@ rt{
 #monster-area {
     position: relative;
 }
+.shopBtn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    padding:5px;
+    text-align:left;
+}
 
+.shopBtn img{
+    width:40px;      /* 画像サイズ */
+    height:40px;
+    object-fit:contain;
+    flex-shrink:0;
+}
 /* 攻撃フラッシュ */
 #hit-effect {
     position: absolute;
@@ -345,6 +359,22 @@ rt{
 /* アニメーション */
 .hit {
     animation: flash 0.3s;
+}
+
+.damageFlash{
+    animation: damageFlash 0.2s;
+}
+
+@keyframes damageFlash{
+    0%{ filter:brightness(1); }
+    50%{ filter:brightness(0.3) sepia(1) hue-rotate(-40deg); }
+    100%{ filter:brightness(1); }
+}.shop-item{
+    width:80px;
+    height:80px;
+    object-fit:contain;
+    display:block;
+    margin:0 auto 5px;
 }
 
 @keyframes flash {
@@ -435,6 +465,7 @@ rt{
         height:50px;
         font-size:16px;
     }
+    
 }
 /* 小型スマホ */
 @media screen and (max-width:480px){
