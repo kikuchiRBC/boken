@@ -1969,7 +1969,7 @@ shopMsg("🐋 問題変更を購入しました！");
          },100);
 }
 function closeShop(){
-
+ document.querySelector(".crossKey").style.display = "flex";
     shopBgm.pause();
     shopBgm.currentTime = 0;
 
@@ -1991,7 +1991,7 @@ function closeShop(){
     draw();
 }
 function visitShop(){
-
+document.querySelector(".crossKey").style.display ="none";
     fieldBgm.pause();
     battleBgm.pause();
     eventBgm.pause();
