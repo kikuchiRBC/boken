@@ -1835,7 +1835,7 @@ if(map[player.y][player.x] === 8){
     startEvent([
         {
             img:"img/soldier.png",
-            text:"兵士：王様をお守りしています！"
+            text:"<ruby>兵士<rt>へいし</rt></ruby>：<ruby>王様<rt>おうさま</rt></ruby>をお<ruby>守<rt>まも</rt></ruby>りしています！"
         }
     ]);
     return;
@@ -1897,53 +1897,53 @@ function buyItem(type){
     if(type==="heal"){
 
         if(healCount <= 0){
-            shopMsg("カワウソが仲間にいません");
+            shopMsg("カワウソが<ruby>仲間<rt>なかま</rt></ruby>にいません");
             return;
         }
 
         if(money < 300){
-            shopMsg("お金が足りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
             return;
         }
 
         money -= 300;
         healCount++;
-        shopMsg("🦦 回復を購入しました！");
+        shopMsg("🦦 <ruby>回復<rt>かいふく</rt></ruby>を<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
     }
 
     else if(type==="change"){
 
         if(changeCount <= 0){
-            shopMsg("シャチが仲間にいません");
+            shopMsg("シャチが<ruby>仲間<rt>なかま</rt></ruby>にいません");
             return;
         }
 
         if(money < 500){
-            shopMsg("お金が足りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
             return;
         }
 
         money -= 500;
         changeCount++;
-shopMsg("🐋 問題変更を購入しました！");
+shopMsg("🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby>を<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
 
     }
 
     else if(type==="hint"){
 
         if(hintCount <= 0){
-            shopMsg("イルカが仲間にいません");
+            shopMsg("イルカが<ruby>仲間<rt>なかま</rt></ruby>にいません");
             return;
         }
 
         if(money < 500){
-            shopMsg("お金が足りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
             return;
         }
 
         money -= 500;
      hintCount++;
-        shopMsg("🐬 ヒントを購入しました！");
+        shopMsg("🐬 ヒントを<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
     }
 
     else if(type==="freeze"){
@@ -1960,7 +1960,7 @@ shopMsg("🐋 問題変更を購入しました！");
 
         money -= 1000;
      freezeCount++;
- shopMsg("❄️ FREEZEを購入しました！");
+ shopMsg("❄️ FREEZEを<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
     }
 
     updateFieldStatus();
@@ -2028,22 +2028,22 @@ function showShopMenu(){
     options.innerHTML = `
   <button onclick="buyItem('heal')"class="shopBtn">
         <img src="img/items/hotate_cookie.png" alt="ホタテクッキー">
-        🦦 ホタテクッキー ☆ 回復スキル+1 (300G)
+        🦦 ホタテクッキー ☆ <ruby>回復<rt>かいふく</rt></ruby>スキル+1 (300G)
     </button>
 
         <button onclick="buyItem('change')"class="shopBtn">
             <img src="img/items/magurosoda.png" alt="マグロソーダ">
-        🐋 マグロソーダ☆問題変更スキル+1 (500G)
+        🐋 マグロソーダ☆<ruby>問題変更<rt>もんだいへんこう</rt></ruby>スキル+1 (500G)
         </button>
 
         <button onclick="buyItem('hint')"class="shopBtn">
             <img src="img/items/compus.png" alt="銀色コンパス">
-        🐬 銀色コンパス☆ヒントスキル+1 (500G)
+        🐬 <ruby>銀色<rt>ぎんいろ</rt></ruby>コンパス☆ヒントスキル+1 (500G)
         </button>
 
         <button onclick="buyItem('freeze')"class="shopBtn">
             <img src="img/items/ice.png" alt="氷の結晶">
-        ❄️ 氷の結晶☆FREEZEスキル+1 (1000G)
+        ❄️ <ruby>氷<rt>こおり</rt></ruby>の<ruby>結晶<rt>けっしょう</rt></ruby>☆FREEZEスキル+1 (1000G)
         </button>
 
         <button onclick="closeShop()">
