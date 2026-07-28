@@ -136,10 +136,7 @@
 <button id="iceBtn"class="skillBtn"onclick="useFreezeStorm()"style="display:none;">❄️ FREEZE STORM</button>
 
 <div class="options-grid" id="options" style="display:none;">
-    <button onclick="startGame('N3')"></button>
-    <button onclick="startGame('N2')"></button>
-    <button onclick="startGame('N1')"></button>
-    <button onclick="startGame('N4')"></button>
+ 
 </div>
 </div>
 
@@ -166,11 +163,23 @@
         <source src="audio/ending.mp3" type="audio/mpeg">
     </audio>
 
+        <audio id="se-misshit" >
+        <source src="audio/misshit.mp3" type="audio/mpeg">
+    </audio>
+
+        <audio id="se-buy" >
+        <source src="audio/se-buy.mp3" type="audio/mpeg">
+    </audio>
+
     <audio id="bgm" loop>
         <source src="audio/maou_bgm_8bit272.mp3" type="audio/mpeg">
     </audio>
     <audio id="se-hit">
         <source src="audio/se1.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="se-shop-open">
+    <source src="audio/shopopen.mp3" type="audio/mpeg">
     </audio>
 <audio id="bgm-shop" loop>
 <source src="audio/shop.mp3" type="audio/mpeg">
@@ -221,6 +230,8 @@
     let eventDone = {};
     let hintCount = 0;
     let innEvent = false;
+    const seBuy =document.getElementById("se-buy");
+    const seShopOpen =document.getElementById("se-shop-open");
     const endingBgm = document.getElementById("bgm-ending");
     const seHit = document.getElementById("se-hit");
     const seDamage = document.getElementById("se-damage");
@@ -231,7 +242,7 @@
     const seSkill2 = document.getElementById("se-skill2");
     const seIce = document.getElementById("se-ice");
     const shopBgm =document.getElementById("bgm-shop");
-  
+    const seMissHit =document.getElementById("se-misshit");
     const guardianBgm =document.getElementById("bgm-guardian");
     const openingBgm =document.getElementById("bgm-opening");
     const eventBgm =document.getElementById("bgm-event");
@@ -348,6 +359,9 @@ let hasIceSword = false;
 let freezeCount = 0;
 let fullScreenEvent = false;
 let castleMode = false;
+
+let pendingLevelUp = null;
+
     // イベント
  function startGametitle(){
 
@@ -460,17 +474,6 @@ function closeEvent(){
     winBgm.currentTime = 0;
     eventMode = false;
 
-if(!startBossAfterEvent){
-
-    if(castleMode){
-        castleBgm.currentTime = 0;
-        castleBgm.play();
-    }else{
-        fieldBgm.currentTime = 0;
-        fieldBgm.play();
-    }
-
-}
 
 if(joinFriend && party.length < friendSets.length){
 
@@ -512,6 +515,8 @@ bossBgm.play();
     bossBattle = true;
     bossStreak = 0;
 
+    updateMonsterBackground();  
+
     document.getElementById("field-screen").style.display = "none";
     document.getElementById("game-container").style.display = "block";
 
@@ -545,7 +550,11 @@ bossBgm.play();
 document.querySelector(".crossKey").style.display = "flex";
     document.getElementById("game-container").style.display = "none";
     document.getElementById("field-screen").style.display = "block";
-   
+   // フィールドへ戻ったらBGM再生
+if(!castleMode && !bossBattle){
+    fieldBgm.currentTime = 0;
+    fieldBgm.play();
+}
 
 if(openingEvent){
     openingEvent = false;
@@ -559,6 +568,7 @@ if(openingEvent){
 
 document.getElementById("monster-img").style.display = "block";
 
+updateMapTiles();
 updateMonsterBackground();
 
 fullScreenEvent = false;
@@ -579,19 +589,19 @@ openingBgm.pause();
     map = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,7,0,0,0,0,0,1],
-        [1,0,0,0,8,0,0,0,8,0,0,0,1],
+        [1,1,1,1,1,1,7,1,1,1,1,1,1],
+        [1,0,8,8,8,0,0,0,8,8,8,0,1],
 
-        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,0,0,0,0,0,0,0,1,1,1],
 
-        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,0,0,0,0,0,0,0,1,1,1],
 
+        [1,1,1,1,0,0,0,0,0,1,1,1,1],
+        [1,1,1,1,8,0,0,0,8,1,1,1,1],
+        [1,1,1,0,0,0,0,0,0,0,1,1,1],
         [1,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,8,0,0,0,8,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,8,0,0,0,0,0,8,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,8,0,0,0,0,0,8,1,0,1],
+        [1,0,1,0,0,0,0,0,0,0,1,0,1],
         [1,1,1,1,1,1,3,1,1,1,1,1,1]
     ];
 
@@ -982,53 +992,24 @@ setTimeout(()=>{
 
 }
 function toggleSound() {
+
     isSoundOn = !isSoundOn;
 
-    const btn = document.getElementById("sound-toggle");
+    const btn =
+    document.getElementById("sound-toggle");
 
-    if (isSoundOn) {
-        btn.innerText = "🔊 SOUND ON";
-        castleBgm.muted = false;
-        fieldBgm.muted = false;
-        audio.muted = false;
-        bossBgm.muted = false;
-        endingBgm.muted = false;
-        openingBgm.muted = false;
-        seHit.muted = false;
-        seDamage.muted = false;
-        seLevel.muted = false;
-        seHeal.muted = false;
-        guardianBgm.muted = false;
-        seIce.muted = false;
-        seSkill1.muted = false;
-        seSkill2.muted = false;
-        eventBgm.muted = false;
-        innBgm.muted = false;
-        shopBgm.muted = false;
- if(currentMapIndex === 29){guardianBgm.play();}
+    btn.innerText =
+    isSoundOn
+        ? "🔊 SOUND ON"
+        : "🔇 SOUND OFF";
 
-    } else {
-        btn.innerText = "🔇 SOUND OFF";
-        castleBgm.muted = true;
-        fieldBgm.muted = true;
-        eventBgm.muted = true;
-        audio.muted = true;
-        bossBgm.muted = true;
-        endingBgm.muted = true;
-        openingBgm.muted = true;    
-        seHit.muted = true;
-        seDamage.muted = true;
-        seLevel.muted = true;
-        seHeal.muted = true;
-        guardianBgm.muted = true;
-        seSkill1.muted = true;
-        seSkill2.muted = true;
-        seIce.muted = true;
-        innBgm.muted = true;
-        shopBgm.muted = true;
-    }
+    document
+        .querySelectorAll("audio")
+        .forEach(audio => {
+            audio.muted = !isSoundOn;
+        });
+
 }
-
 function shakeMonster() {
     monsterImg.classList.remove("shake");
     void monsterImg.offsetWidth;
@@ -1290,10 +1271,23 @@ for(let i=0;i<30;i++){
 
 function startEnding(){
 
+    eventBgm.pause();
+    eventBgm.currentTime = 0;
+
+    fieldBgm.pause();
+    battleBgm.pause();
+    bossBgm.pause();
+    guardianBgm.pause();
+
+    endingBgm.currentTime = 0;
+    endingBgm.play();
+
     endingMode = true;
     endingIndex = 0;
+
     document.getElementById("skillButtons").style.display = "none";
     document.getElementById("options").style.display = "none";
+
     showEndingScene();
 }
 function showEndingScene(){
@@ -1432,23 +1426,31 @@ for(let i=0; i<chestCount; i++){
     }
 if(index === 29){
 
-    const bossMap = [
+   const bossMap = [
 
-    [1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,1,0,1,0,1,0,0,0,1],
-    [1,0,0,0,1,0,6,0,1,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,0,0,0,0,0,0,1,0,1],
-    [1,0,1,0,0,0,0,0,0,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,1,0,0,0,1,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1]
+[1,1,1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,2,0,7,0,2,0,0,0,1],
+[1,0,0,0,0,0,6,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
 
-    ];
+[1,0,2,0,0,0,0,0,0,0,2,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+[1,0,0,0,2,0,0,0,2,0,0,0,1],
+
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+[1,0,2,0,0,0,0,0,0,0,2,0,1],
+
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+[1,0,0,0,2,0,0,0,2,0,0,0,1],
+
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
+
+[1,1,1,1,1,1,1,1,1,1,1,1,1]
+
+];
 
     return bossMap;
 }
@@ -1484,11 +1486,13 @@ playerImgDown.src = "img/hero_down.png";
 const templeImg = new Image();
 templeImg.src = "img/temple.png";
 
+const templeMapBg = new Image();
+templeMapBg.src = "img/temple_map_bg.png";
+
 const guardianMapImg = new Image();
 guardianMapImg.src = "guardian_map.png";
 
 function draw(){
-
 
     party.forEach((friend, i) => {
 
@@ -1498,14 +1502,25 @@ function draw(){
             friend.x = pos.x;
             friend.y = pos.y;
         }
-
     });
-
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
+    // 神殿背景
+    if(currentMapIndex === 29){
+
+        ctx.drawImage(
+            templeMapBg,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
     // マップ描画
-for(let y=0; y<map.length; y++){
+    for(let y=0; y<map.length; y++){
     for(let x=0; x<map[y].length; x++){
 
 // 城マップ
@@ -1557,9 +1572,18 @@ if(castleMode){
     continue;
 }
 
-if(map[y][x] === 0)
-    ctx.drawImage(grassImg,x*tileSize,y*tileSize,tileSize,tileSize);
+if(currentMapIndex !== 29){
 
+    if(map[y][x] === 1)
+        ctx.drawImage(
+            wallImg,
+            x*tileSize,
+            y*tileSize,
+            tileSize,
+            tileSize
+        );
+
+}
 if(map[y][x] === 1)
     ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
 
@@ -1888,24 +1912,25 @@ if(map[player.y][player.x] === 8){
 }
 function shopMsg(msg){
     textEl.innerHTML =
-    `🛒 いらっしゃいませ！<br>
-    所持金：${money}G<br><br>
+    `🛒 いらっしゃいませ！ジンベエザメマートへようこそ♪<br>
+    <ruby>所持金<rt>しょじきん</rt></ruby>💰：${money}G<br><br>
     ${msg}`;
 }
 function buyItem(type){
 
     if(type==="heal"){
 
-        if(healCount <= 0){
-            shopMsg("カワウソが<ruby>仲間<rt>なかま</rt></ruby>にいません");
+        if(party.length < 1){
+            shopMsg("<ruby>使<rt>つか</rt></ruby>える人がいないみたいだよ。");
             return;
         }
 
         if(money < 300){
-            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>らないよ");
             return;
         }
-
+        seBuy.currentTime = 0;
+        seBuy.play();
         money -= 300;
         healCount++;
         shopMsg("🦦 <ruby>回復<rt>かいふく</rt></ruby>を<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
@@ -1913,53 +1938,59 @@ function buyItem(type){
 
     else if(type==="change"){
 
-        if(changeCount <= 0){
-            shopMsg("シャチが<ruby>仲間<rt>なかま</rt></ruby>にいません");
+        if(party.length < 2){
+            shopMsg("<ruby>使<rt>つか</rt></ruby>える人がいないみたいだよ。");
             return;
         }
 
         if(money < 500){
-            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>らないよ");
             return;
         }
 
         money -= 500;
         changeCount++;
+        seBuy.currentTime = 0;
+        seBuy.play();
 shopMsg("🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby>を<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
 
     }
 
     else if(type==="hint"){
 
-        if(hintCount <= 0){
-            shopMsg("イルカが<ruby>仲間<rt>なかま</rt></ruby>にいません");
+        if(party.length < 3){
+            shopMsg("<ruby>使<rt>つか</rt></ruby>える人がいないみたいだよ。");
             return;
         }
 
         if(money < 500){
-            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>らないよ");
             return;
         }
 
         money -= 500;
      hintCount++;
+     seBuy.currentTime = 0;
+        seBuy.play();
         shopMsg("🐬 ヒントを<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
     }
 
     else if(type==="freeze"){
 
         if(!hasIceSword){
-            shopMsg("アイスソードを持っていません");
+            shopMsg("アイスソードがないとつかえないよ！");
             return;
         }
 
         if(money < 1000){
-            shopMsg("お金が足りません");
+            shopMsg("お<ruby>金<rt>かね</rt></ruby>が<ruby>足<rt>た</rt></ruby>らないよ");
             return;
         }
 
         money -= 1000;
      freezeCount++;
+     seBuy.currentTime = 0;
+        seBuy.play();
  shopMsg("❄️ FREEZEを<ruby>購入<rt>こうにゅう</rt></ruby>しました！");
     }
 
@@ -1972,7 +2003,8 @@ function closeShop(){
  document.querySelector(".crossKey").style.display = "flex";
     shopBgm.pause();
     shopBgm.currentTime = 0;
-
+seShopOpen.currentTime = 0;
+seShopOpen.play();
     if(castleMode){
         castleBgm.play();
     }else{
@@ -1991,6 +2023,8 @@ function closeShop(){
     draw();
 }
 function visitShop(){
+    seShopOpen.currentTime = 0;
+seShopOpen.play();
 document.querySelector(".crossKey").style.display ="none";
     fieldBgm.pause();
     battleBgm.pause();
@@ -2057,6 +2091,8 @@ function startBossEvent(){
 
     eventDone["guardian"] = true;
 
+     eventBgm.pause();
+    eventBgm.currentTime = 0;
     startBossAfterEvent = true;
     fieldBgm.pause(); 
     fieldBgm.currentTime = 0;
@@ -2278,29 +2314,25 @@ function getMonsterByLevel() {
 }
 
     function updateStats() {
+while (exp >= 300) {
 
-    while (exp >= 300) {
-        const oldLv = lv;
-        
-        exp -= 300;
-        lv++;
-        hp = Math.min(hp + 30, maxHp);
+    const oldLv = lv;
 
-        seLevel.currentTime = 0;
-        seLevel.play();
+    exp -= 300;
+    lv++;
+    hp = Math.min(hp + 30, maxHp);
 
+    pendingLevelUp = {
+        oldLv: oldLv,
+        newLv: lv
+    };
 
-    startEvent([
-        {
-            img:"img/levelup.png",
-            text:`ペンギンのレベルが ${oldLv} → ${lv} にあがった！`
-        },
-        {
-            img:"img/levelup.png",
-            text:"HPが30回復した！"
-        }
-    ]);
+    seLevel.currentTime = 0;
+    seLevel.play();
 }
+
+ 
+
 
 
      //   if (lv >= 20 && !bossBattle) {
@@ -2595,7 +2627,8 @@ function checkAnswer(selected, correct) {
         // 正解したけど攻撃が外れる
         // ----------------------------------------
         if (Math.random() > hitRate) {
-
+           seMissHit.currentTime = 0;
+           seMissHit.play();
             textEl.innerHTML =
                 `
                 <span style="color:#ff0">
@@ -2828,12 +2861,12 @@ function useHeal(){
     updateStats();
 
     textEl.innerHTML =
-    "🦦 カワウソが応援した！<br>HPが30回復した！";
+    "🦦 カワウソがホタテクッキーをみんなに<ruby>配<rt>くば</rt></ruby>った！<br>HPが30回復した！";
 
     healCount--;
 
     document.getElementById("healBtn").innerHTML =
-`🦦 回復 (${healCount})`;
+`🦦 <ruby>回復<rt>かいふく</rt></ruby> (${healCount})`;
 
     document.getElementById("healBtn").disabled = true;
 
@@ -2858,7 +2891,7 @@ function changeQuestionSkill(){
     document.getElementById("changeBtn").disabled = true;
 
 document.getElementById("changeBtn").innerHTML =
-`🐋 問題変更 (${changeCount})`;
+`🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby> (${changeCount})`;
 
 textEl.innerHTML =
 "🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
@@ -2942,9 +2975,9 @@ function useFreezeStorm(){
 
     textEl.innerHTML =
     `
-    ❄️ フリーズストーム発動！
+    ❄️ フリーズストーム<ruby>発動<rt>はつどう</rt></ruby>！
     <br>
-    吹雪が敵を包み込んだ！
+    <ruby>吹雪<rt>ふぶき</rt></ruby>が<ruby>敵<rt>てき</rt></ruby>を<ruby>襲<rt>おそ</rt></ruby>った！
     `;
 
     setTimeout(()=>{
@@ -3002,15 +3035,33 @@ function pressOK() {
         return;
     }
 
-    if (battleWin) {
+ if (battleWin) {
+
     document.getElementById("options").innerHTML = "";
-        battleWin = false;
-    
-        returnToField();
-        winBgm.pause();
+
+    battleWin = false;
+
+    returnToField();
+
+    winBgm.pause();
     winBgm.currentTime = 0;
 
+    if(pendingLevelUp){
+
+        startEvent([
+            {
+                img:"img/levelup.png",
+                text:`ペンギンのレベルが ${pendingLevelUp.oldLv} → ${pendingLevelUp.newLv} にあがった！`
+            },
+            {
+                img:"img/levelup.png",
+                text:"HPが30回復した！"
+            }
+        ]);
+
+        pendingLevelUp = null;
     }
+}
 }
 function regenerateMap(){
 

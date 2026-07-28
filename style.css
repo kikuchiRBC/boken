@@ -9,7 +9,9 @@ button rt{
     font-size:0.5em;
     color:#ffffff;
 }
-
+#field {
+    background-color: #150d61;
+}
 rt{
     font-size:0.55em;
     color:#ffffff;
@@ -20,7 +22,19 @@ rt{
     left: 10px;
     font-size: 0.8rem;
 }
+.shopBtn{
+    display:flex;
+    align-items:center;
+    gap:10px;
 
+    width:100%;
+    min-height:60px;
+
+    padding:8px;
+    text-align:left;
+
+    font-size:14px;
+}
 #skillButtons{
     display:flex;
     gap:10px;
@@ -435,6 +449,18 @@ rt{
         font-size:0.9rem;
         padding:12px;
     }
+
+    .shopBtn{
+        font-size:12px;
+        gap:6px;
+        padding:6px;
+    }
+
+    .shopBtn img{
+        width:32px;
+        height:32px;
+    }
+
 
     #sound-toggle{
         position:fixed;
