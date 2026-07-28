@@ -330,18 +330,59 @@ rt{
     margin-bottom:8px;
 
     font-size:18px;
-}            
-#area-name {
-    position: absolute;
-    top: 10px;     /* ←ここをbottom → topに変更 */
-    right: 10px;   /* ←右はそのまま */
-    font-size: 1rem;
-    color: #ff0;
-    background: rgba(0,0,0,1);
-    padding: 5px 10px;
-    border: 1px solid #fff;
-}
+}     
+#difficulty{
+    width:250px;
+    height:60px;
 
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+
+    color:#dad3d3;
+    border:3px solid gold;
+    border-radius:15px;
+    background:
+    linear-gradient(
+        180deg,
+        #2c3e50,
+        #0f172a
+    );
+
+    border:3px solid #ffd700;
+    border-radius:15px;
+
+    box-shadow:
+        0 0 15px rgba(255,215,0,.5);
+
+    margin-bottom:20px;
+}       
+#area-name{
+    position:absolute;
+    top:10px;
+    right:10px;
+
+    padding:8px 16px;
+
+    color:#fff8c6;
+    font-size:18px;
+    font-weight:bold;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(40,40,60,.9),
+            rgba(10,10,20,.95)
+        );
+
+    border:2px solid #d6c27a;
+    border-radius:12px;
+
+    box-shadow:
+        0 0 10px rgba(255,215,0,.4);
+
+    letter-spacing:1px;
+}
 #monster-area {
     position: relative;
 }
@@ -538,10 +579,62 @@ rt{
 }
 
 #titleScreen button{
-    width:250px;
-    height:70px;
-    font-size:24px;
+    width:280px;
+    height:80px;
+
+    font-size:28px;
+    font-weight:bold;
+
+    color:white;
+
+    background:
+    linear-gradient(
+        180deg,
+        #ffb347,
+        #ff6b00
+    );
+
+    border:3px solid #fff8c6;
+    border-radius:20px;
+
+    box-shadow:
+        0 6px 0 #b34d00,
+        0 0 20px rgba(255,170,0,.5);
+
+    transition:.2s;
+    animation:startGlow 2s infinite;
 }
+#titleScreen button:hover{
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 9px 0 #b34d00,
+        0 0 30px rgba(255,220,100,.8);
+}
+#titleScreen button:active{
+    transform:translateY(5px);
+
+    box-shadow:
+        0 2px 0 #b34d00;
+}
+@keyframes startGlow{
+
+    0%{
+        box-shadow:
+        0 0 10px rgba(255,215,0,.4);
+    }
+
+    50%{
+        box-shadow:
+        0 0 30px rgba(255,255,120,.9);
+    }
+
+    100%{
+        box-shadow:
+        0 0 10px rgba(255,215,0,.4);
+    }
+}
+
 #specialSkill{
     margin-top:10px;
     text-align:center;

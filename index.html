@@ -41,8 +41,15 @@
 <div id="titleScreen">
    <img id="titleLogo" src="img/title.jpg" alt="なかよし海の">
   
+<select id="difficulty">
+    <option value="n3">N3</option>
+    <option value="n2">N2</option>
+    <option value="n1">N1</option>
+    <option value="kids">KIDS</option>
+</select>
+
 <button onclick="startGametitle()">
-    ゲームスタート
+ゲームスタート
 </button>
 
 </div>
@@ -222,7 +229,9 @@
         <source src="audio/win.mp3" type="audio/mpeg">
 </audio>
 <script src="js/questions.js"></script>
-
+<script src="js/questions_n2.js"></script>
+<script src="js/questions_n1.js"></script>
+<script src="js/questions_kids.js"></script>
     <script>
         
         let battleWin = false;
@@ -230,6 +239,8 @@
     let eventDone = {};
     let hintCount = 0;
     let innEvent = false;
+    let currentQuestions = [];
+    let currentDifficulty = "n3";
     const seBuy =document.getElementById("se-buy");
     const seShopOpen =document.getElementById("se-shop-open");
     const endingBgm = document.getElementById("bgm-ending");
@@ -363,10 +374,25 @@ let castleMode = false;
 let pendingLevelUp = null;
 
     // イベント
- function startGametitle(){
+function startGametitle(){
+
+    currentDifficulty =
+    document.getElementById("difficulty").value;
+
+    if(currentDifficulty === "kids"){
+        currentQuestions = questionsKids;
+    }
+    else if(currentDifficulty === "n3"){
+        currentQuestions = questionsN3;
+    }
+    else if(currentDifficulty === "n2"){
+        currentQuestions = questionsN2;
+    }
+    else{
+        currentQuestions = questionsN1;
+    }
 
     document.getElementById("titleScreen").style.display = "none";
-
     openingBgm.currentTime = 0;
     openingBgm.play();
 
@@ -448,7 +474,7 @@ function showEventMessage(){
     }
     else if(currentMapIndex === 29){
         monsterArea.style.backgroundImage =
-        "url('img/temple_map_bg.jpg')";
+        "url('img/bg_boss.jpg')";
     }
     else{
         updateMonsterBackground();
@@ -1027,7 +1053,7 @@ return;
 // 神殿
 if(currentMapIndex === 29){
 monsterArea.style.backgroundImage =
-"url('img/temple_map_bg.jpg')";
+"url('img/bg_boss.jpg')";
 return;
 }
     if(bossBattle){
@@ -1429,8 +1455,8 @@ if(index === 29){
    const bossMap = [
 
 [1,1,1,1,1,1,1,1,1,1,1,1,1],
-[1,0,0,0,2,0,7,0,2,0,0,0,1],
-[1,0,0,0,0,0,6,0,0,0,0,0,1],
+[1,0,0,0,2,0,6,0,2,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,0,0,0,1],
 [1,0,0,0,0,0,0,0,0,0,0,0,1],
 
 [1,0,2,0,0,0,0,0,0,0,2,0,1],
@@ -1510,9 +1536,9 @@ function draw(){
     if(currentMapIndex === 29){
 
         ctx.drawImage(
-            templeMapBg,
-            0,
-            0,
+            grassImg,
+             x * tileSize,
+             y * tileSize,
             canvas.width,
             canvas.height
         );
@@ -1584,17 +1610,57 @@ if(currentMapIndex !== 29){
         );
 
 }
-if(map[y][x] === 1)
-    ctx.drawImage(wallImg,x*tileSize,y*tileSize,tileSize,tileSize);
+      // 地面を先に描画
+      if(currentMapIndex !== 29){
+        ctx.drawImage(
+            grassImg,
+            x * tileSize,
+            y * tileSize,
+            tileSize,
+            tileSize
+        );
+      }
 
-if(map[y][x] === 2)
-    ctx.drawImage(treeImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        // その上にオブジェクト
+        if(map[y][x] === 1){
+            ctx.drawImage(
+                wallImg,
+                x * tileSize,
+                y * tileSize,
+                tileSize,
+                tileSize
+            );
+        }
 
-if(map[y][x] === 3)
-    ctx.drawImage(stairsImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        if(map[y][x] === 2){
+            ctx.drawImage(
+                treeImg,
+                x * tileSize,
+                y * tileSize,
+                tileSize,
+                tileSize
+            );
+        }
 
-if(map[y][x] === 4)
-    ctx.drawImage(innImg,x*tileSize,y*tileSize,tileSize,tileSize);
+        if(map[y][x] === 3){
+            ctx.drawImage(
+                stairsImg,
+                x * tileSize,
+                y * tileSize,
+                tileSize,
+                tileSize
+            );
+        }
+
+        if(map[y][x] === 4){
+            ctx.drawImage(
+                innImg,
+                x * tileSize,
+                y * tileSize,
+                tileSize,
+                tileSize
+            );
+        }
 
 if(map[y][x] === 5)
     ctx.drawImage(templeImg,x*tileSize,y*tileSize,tileSize,tileSize);
@@ -2484,7 +2550,7 @@ function loadQuestion() {
     document.getElementById('area-name').innerText =
     getAreaName();
 
-    const list = questions2;
+    const list = currentQuestions;
 
     const qData =
     list[Math.floor(Math.random() * list.length)];
