@@ -233,7 +233,7 @@
 <script src="js/questions_n1.js"></script>
 <script src="js/questions_kids.js"></script>
     <script>
-        
+        let currentLevel = "N2";
         let battleWin = false;
     let isSoundOn = true;
     let eventDone = {};
@@ -370,7 +370,8 @@ let hasIceSword = false;
 let freezeCount = 0;
 let fullScreenEvent = false;
 let castleMode = false;
-
+let hasBunchoMage = false;
+let guardianEvent = false;
 let pendingLevelUp = null;
 
     // イベント
@@ -424,6 +425,7 @@ startEvent([
 function startEvent(messages, friend=null){
 
  // 他のBGM停止
+ 
  shopBgm.pause();
 shopBgm.currentTime = 0;
  fieldBgm.pause(); 
@@ -434,14 +436,20 @@ if(!castleMode){
     castleBgm.pause();
 }
 
- if(!openingEvent && !innEvent && !castleMode){
+if(
+    !openingEvent &&
+    !innEvent &&
+    !castleMode &&
+    !guardianEvent
+){
     eventBgm.currentTime = 0;
     eventBgm.play();
- }
+}
 
 document.querySelector(".crossKey").style.display = "none";
     eventMode = true;
 document.getElementById("skillButtons").style.display = "none";
+document.getElementById("iceBtn").style.display = "none";
     eventMessages = messages;
     eventIndex = 0;
 
@@ -488,12 +496,13 @@ function showEventMessage(){
 }
 
 function closeEvent(){
+    
     eventBgm.pause();
     eventBgm.currentTime = 0;
 
     innBgm.pause();
     innBgm.currentTime = 0;
-
+document.getElementById("iceBtn").style.display = "none";
     innEvent = false;
 
     winBgm.pause();
@@ -519,7 +528,9 @@ if(joinFriend && party.length < friendSets.length){
 if(joinFriend === "dolphin"){
     hintCount = 1;
 }
-
+if(joinFriend === "buncho"){
+    hasBunchoMage = true;
+}
     joinFriend = null;
 }
 
@@ -596,7 +607,9 @@ document.getElementById("monster-img").style.display = "block";
 
 updateMapTiles();
 updateMonsterBackground();
-
+if(!startBossAfterEvent){
+    guardianEvent = false;
+}
 fullScreenEvent = false;
 updateFieldStatus();
 
@@ -1104,7 +1117,6 @@ function playHitEffect() {
 
    
      
-  let currentLevel = "N2";
 
     let exp = 0;
     let lv = 1;
@@ -1215,13 +1227,12 @@ const friendSets = [
         up: loadImage("img/hero3_up.png"),
         down: loadImage("img/hero3_down.png")
     },
-
     {
-        left: loadImage("img/dolphin_left.png"),
-        right: loadImage("img/dolphin_right.png"),
-        up: loadImage("img/dolphin_up.png"),
-        down: loadImage("img/dolphin_down.png")
-    }
+       left: loadImage("img/hero4_left.png"),
+        right: loadImage("img/hero4_right.png"),
+        up: loadImage("img/hero4_up.png"),
+        down: loadImage("img/hero4_down.png")
+}
 ];
 const player = {
     x: 2,
@@ -1342,7 +1353,7 @@ function nextEnding(){
     if(endingIndex >= endingScenes.length){
 
         textEl.innerHTML =
-        "ありがとうございました！";
+        "プレイしていただき、ありがとうございました！";
 
         document.getElementById("options").innerHTML =
         "<button onclick='location.reload()'>もう一度遊ぶ</button>";
@@ -1497,17 +1508,6 @@ if(index === 29){
 let currentMapIndex = 0;
 let map = maps[currentMapIndex];
 
-const playerImgRight = new Image();
-playerImgRight.src = "img/hero_right.png";
-
-const playerImgLeft = new Image();
-playerImgLeft.src = "img/hero_left.png";
-
-const playerImgUp = new Image();
-playerImgUp.src = "img/hero_up.png";
-
-const playerImgDown = new Image();
-playerImgDown.src = "img/hero_down.png";
 
 const templeImg = new Image();
 templeImg.src = "img/temple.png";
@@ -1535,12 +1535,13 @@ function draw(){
     // 神殿背景
     if(currentMapIndex === 29){
 
-        ctx.drawImage(
-            grassImg,
-             x * tileSize,
-             y * tileSize,
-            canvas.width,
-            canvas.height
+ ctx.drawImage(
+    grassImg,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+
         );
 
     }
@@ -1774,7 +1775,112 @@ function openChest(){
     const gold =
     Math.floor(Math.random() * 500) + 1;
 
-    money += gold;
+    const rewardGold =
+    hasBunchoMage ? gold * 2 : gold;
+    
+    money += rewardGold;
+
+
+// 文鳥イベント
+if(
+    party.length >= 3 &&
+    !hasBunchoMage &&
+    Math.random() < 0.10
+){
+    startEvent([
+
+    {
+        img:"img/penguin.png",
+        text:"あれ？ <ruby>宝箱<rt>たからばこ</rt></ruby>からなにか声が聞こえる…。"
+    },
+    {
+        img:"img/buncho_box.png",
+        text:"？？？：た、たすけてくれー！"
+    },
+    {
+        img:"img/penguin.png",
+        text:"ペンギン：えっ！？ <ruby>宝箱<rt>たからばこ</rt></ruby>がしゃべった！？"
+    },
+    {
+        img:"img/chest.png",
+        text:"？？？：ちがう！ <ruby>宝箱<rt>たからばこ</rt></ruby>じゃない！"
+    },
+    {
+        img:"img/chest.png",
+        text:"？？？：<ruby>赤魔導士<rt>あかまどうし</rt></ruby>ブンタだ！"
+    },
+    {
+        img:"img/otter.png",
+        text:"カワウソ：どうして<ruby>宝箱<rt>たからばこ</rt></ruby>の中にいるの？"
+    },
+    {
+        img:"img/chest.png",
+        text:"ブンタ：<ruby>宝箱<rt>たからばこ</rt></ruby>の中にお<ruby>宝<rt>たから</rt></ruby>があると思って入ったんだ。"
+    },
+    {
+        img:"img/orca.png",
+        text:"シャチ：それで？"
+    },
+    {
+        img:"img/chest.png",
+        text:"ブンタ：お<ruby>宝<rt>たから</rt></ruby>はなかった。"
+    },
+    {
+        img:"img/chest.png",
+        text:"ブンタ：ついでに、ふたが<ruby>閉<rt>し</rt></ruby>まって出られなくなった。"
+    },
+    {
+        img:"img/dolphin.png",
+        text:"イルカ：すごいうっかりだね…。"
+    },
+    {
+        img:"img/penguin.png",
+        text:"ペンギン：ぼくたちが<ruby>助<rt>たす</rt></ruby>けるよ！"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：ぷはーっ！ 助かった！"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：私は<ruby>赤魔導士<rt>あかまどうし</rt></ruby>ブンタ。<ruby>昔<rt>むかし</rt></ruby>は<ruby>王国<rt>おうこく</rt></ruby>の<ruby>魔導士<rt>まどうし</rt></ruby>だった。"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：でも<ruby>魔法<rt>まほう</rt></ruby>の<ruby>研究<rt>けんきゅう</rt></ruby>ばかりしていたせいで、うっかり<ruby>失敗<rt>しっぱい</rt></ruby>ばかりしてな…。"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：今回も<ruby>宝箱<rt>たからばこ</rt></ruby>トラップに自分から引っかかった。"
+    },
+    {
+        img:"img/otter.png",
+        text:"カワウソ：それ、トラップじゃなくてただの<ruby>宝箱<rt>たからばこ</rt></ruby>だよ？"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：……。"
+    },
+    {
+        img:"img/allfriends.png",
+        text:"みんな：あはははは！"
+    },
+    {
+        img:"img/buncho.png",
+        text:"ブンタ：お<ruby>礼<rt>れい</rt></ruby>に私も<ruby>旅<rt>たび</rt></ruby>を手伝おう！"
+    },
+    {
+        img:"img/buncho.png",
+        text:"♪<ruby>赤魔導士<rt>あかまどうし</rt></ruby>ブンタが<ruby>仲間<rt>なかま</rt></ruby>になった！"
+    },
+    {
+        img:"img/buncho.png",
+        text:"✨ブンタの<ruby>幸運魔法<rt>こううんまほう</rt></ruby>！ <ruby>経験値<rt>けいけんち</rt></ruby>とお金が2倍になった！"
+    }
+],"buncho");
+return;
+}
+
 
     startEvent([
                 {
@@ -1783,7 +1889,7 @@ function openChest(){
         },
         {
             img:"img/chest1.png",
-            text:`宝箱を開けた！<br>💰 ${gold}G を手に入れた！`
+            text:`宝箱を開けた！<br>💰 ${rewardGold}G を手に入れた！`
         }
     ]);
 
@@ -1908,7 +2014,7 @@ if(
     currentMapIndex >= 18 &&
     currentMapIndex < 24 &&
     !hasIceSword &&
-    Math.random() < 0.01
+    Math.random() < 0.05
 ){
     getIceSword();
     return;
@@ -2152,7 +2258,7 @@ function showShopMenu(){
     `;
 }
 function startBossEvent(){
-
+guardianEvent = true;
     if(eventDone["guardian"]) return;
 
     eventDone["guardian"] = true;
@@ -2716,7 +2822,11 @@ function checkAnswer(selected, correct) {
         // 通常モンスター撃破
         // ========================================
 
-        const reward = getExpReward();
+        let reward = getExpReward();
+
+        if(hasBunchoMage){
+            reward *= 2;
+            }
 
         exp += reward;
 
@@ -3048,7 +3158,13 @@ function useFreezeStorm(){
 
     setTimeout(()=>{
 
-        exp += getExpReward();
+       let reward = getExpReward();
+
+        if(hasBunchoMage){
+            reward *= 2;
+        }
+
+        exp += reward;
 
         battleWin = true;
 
