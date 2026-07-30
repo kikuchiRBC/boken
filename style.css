@@ -165,7 +165,204 @@ rt{
 
     animation: battleFlash 1.2s;
 }
+#skillEffect{
+    position:absolute;
+    inset:0;
+    display:none;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:50;
+}
+.freezeEffect{
+    display:block;
+    background:
+    radial-gradient(
+        rgba(180,240,255,.8),
+        rgba(100,180,255,.3),
+        transparent
+    );
 
+    animation:freezeFlash 1s ease-out;
+}
+
+
+#cutin{
+
+    position:fixed;
+    inset:0;
+
+    display:none;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        repeating-linear-gradient(
+            -20deg,
+            rgba(255,255,255,.04) 0px,
+            rgba(255,255,255,.04) 20px,
+            transparent 20px,
+            transparent 40px
+        ),
+        radial-gradient(
+            rgba(0,180,255,.4),
+            rgba(0,0,0,.9)
+        );
+
+    backdrop-filter:blur(4px);
+
+    z-index:99999;
+}
+
+#cutinImg{
+
+    width:95vw;
+    max-width:1200px;
+    max-height:90vh;
+    object-fit:contain;
+
+    filter:
+        drop-shadow(0 0 20px #00ffff)
+        drop-shadow(0 0 60px #00ffff)
+        drop-shadow(0 0 120px #ffffff);
+
+    animation:cutinAppear .6s ease-out;
+}
+
+#cutin.flash{
+    animation:screenFlash .25s;
+}
+
+@keyframes screenFlash{
+
+    0%{
+        background:white;
+    }
+
+    100%{
+        background:rgba(0,0,0,.7);
+    }
+}
+
+@keyframes cutinAppear{
+
+    0%{
+        transform:
+            translateX(-150%)
+            rotate(-10deg)
+            skewX(-15deg)
+            scale(2);
+
+        opacity:0;
+    }
+
+    40%{
+        transform:
+            translateX(50px)
+            rotate(3deg)
+            scale(1.1);
+
+        opacity:1;
+    }
+
+    60%{
+        transform:
+            translateX(-10px)
+            scale(1.05);
+    }
+
+    100%{
+        transform:
+            translateX(0)
+            rotate(0deg)
+            scale(1);
+
+        opacity:1;
+    }
+}
+
+.hintFlash{
+    animation:hintFlash 1s;
+}
+
+@keyframes hintFlash{
+
+    0%{
+        box-shadow:0 0 0 cyan;
+    }
+
+    50%{
+        box-shadow:
+        0 0 50px cyan,
+        0 0 100px white;
+    }
+
+    100%{
+        box-shadow:0 0 0 cyan;
+    }
+}
+
+#snowLayer{
+    width:100%;
+    height:100%;
+}
+
+.freezeSnow{
+    display:block;
+}
+
+.freezeSnow::before,
+.freezeSnow::after{
+    content:"❄ ❅ ❆ ❄ ❅ ❆ ❄ ❅ ❆";
+    position:absolute;
+    left:0;
+    top:-50px;
+
+    width:100%;
+    font-size:28px;
+    color:#dff8ff;
+
+    letter-spacing:30px;
+
+    animation:snowFall 1.5s linear infinite;
+}
+
+.freezeSnow::after{
+    animation-delay:0.7s;
+    opacity:0.7;
+}
+
+@keyframes snowFall{
+
+    0%{
+        transform:translateY(-50px);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:translateY(260px);
+        opacity:0;
+    }
+}
+@keyframes freezeFlash{
+    0%{
+        opacity:0;
+        transform:scale(.3);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.2);
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(2);
+    }
+}
 @keyframes battleFlash{
 
     0%{
@@ -182,6 +379,49 @@ rt{
     }
 }
 
+.healFlash{
+    animation:healFlash 1s;
+}
+
+@keyframes healFlash{
+    0%{ background:#00ff88; opacity:0; }
+    50%{ opacity:.5; }
+    100%{ opacity:0; }
+}
+.changeFlash{
+    animation:changeFlash .8s;
+}
+
+@keyframes changeFlash{
+
+    0%{
+        filter:hue-rotate(0deg);
+    }
+
+    100%{
+        filter:hue-rotate(360deg);
+    }
+}
+.hintFlash{
+    animation:hintFlash 1s;
+}
+
+@keyframes hintFlash{
+
+    0%{
+        box-shadow:0 0 0 cyan;
+    }
+
+    50%{
+        box-shadow:
+        0 0 50px cyan,
+        0 0 100px white;
+    }
+
+    100%{
+        box-shadow:0 0 0 cyan;
+    }
+}
 /* これそのままでOK */
 
 #message-window{
@@ -435,7 +675,19 @@ rt{
 @keyframes flash {
     0% { opacity: 1; }
     100% { opacity: 0; }
-}/* ========= スマホ対応 ========= */
+}
+
+
+
+
+.okBtn,
+.cancelBtn{
+    touch-action: manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color: transparent;
+}
+/* ========= スマホ対応 ========= */
 @media screen and (max-width:768px){
 
     body{
@@ -677,37 +929,96 @@ canvas{
 
 .actionButtons{
     position:fixed;
-
     right:20px;
     bottom:20px;
 
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:12px;
 
     z-index:9999;
 }
 
 
 
+
+/* OKボタン */
 .okBtn{
-    width:100px;
-    height:60px;
-    background:#2ecc71;
+    width:110px;
+    height:70px;
+
+    background:linear-gradient(
+        180deg,
+        #4fc3ff,
+        #0066ff
+    );
+
+    border:2px solid #bdefff;
+    border-radius:18px;
+
     color:white;
-    font-size:20px;
-    border:none;
-    border-radius:12px;
+    font-size:22px;
+    font-weight:bold;
+
+    box-shadow:
+        0 5px 0 #003d99,
+        0 0 20px rgba(0,150,255,.6);
+
+    transition:.15s;
 }
 
+.okBtn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 7px 0 #003d99,
+        0 0 25px rgba(0,150,255,.9);
+}
+
+.okBtn:active{
+    transform:translateY(4px);
+
+    box-shadow:
+        0 1px 0 #003d99;
+}
+
+
+/* MAPボタン */
 .cancelBtn{
-    width:100px;
-    height:60px;
-    background:#e74c3c;
+    width:110px;
+    height:70px;
+
+    background:linear-gradient(
+        180deg,
+        #ff8a8a,
+        #d90000
+    );
+
+    border:2px solid #ffd5d5;
+    border-radius:18px;
+
     color:white;
-    font-size:18px;
-    border:none;
-    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+
+    box-shadow:
+        0 5px 0 #7a0000,
+        0 0 20px rgba(255,0,0,.5);
+
+    transition:.15s;
+}
+
+.cancelBtn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 7px 0 #7a0000,
+        0 0 25px rgba(255,80,80,.8);
+}
+
+.cancelBtn:active{
+    transform:translateY(4px);
+
+    box-shadow:
+        0 1px 0 #7a0000;
 }
 #statusBar{
 
