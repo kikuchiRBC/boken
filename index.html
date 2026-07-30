@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="controller">
+        <div class="controller" style="display:none;">
 
     <div class="crossKey">
         <div class="row">
@@ -89,7 +89,9 @@
 
 
 
-
+<div id="cutin">
+    <img id="cutinImg">
+</div>
 
     <div id="game-container" style="display:none;">
         <div class="stats">
@@ -103,7 +105,10 @@
 <div id="monster-area">
 
     <div id="hit-effect"></div> 
-    
+
+    <div id="skillEffect">
+        <div id="snowLayer"></div>
+    </div>
 
 <div id="monster-wrapper" class="float">
     <img id="monster-img" src="start.jpg">
@@ -228,6 +233,8 @@
 <audio id="bgm-win">
         <source src="audio/win.mp3" type="audio/mpeg">
 </audio>
+<script src="js/event.js"></script>
+<script src="js/map.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/questions_n2.js"></script>
 <script src="js/questions_n1.js"></script>
@@ -241,6 +248,8 @@
     let innEvent = false;
     let currentQuestions = [];
     let currentDifficulty = "n3";
+    let templeEvent = false;
+    
     const seBuy =document.getElementById("se-buy");
     const seShopOpen =document.getElementById("se-shop-open");
     const endingBgm = document.getElementById("bgm-ending");
@@ -286,16 +295,7 @@ const monsterArea =
 document.getElementById("monster-area");
 const textEl =
 document.getElementById("text");
-        // モンスターの画像リスト
-        const monsterImages = [
-            "oni.png", // 鬼
-            "dragon2.png", // ドラゴン風
-            "slime-c.png", // スライム風）
-            "night.png" , // 騎士風
-            "monnene.jpg" , // モンエネ）
-            "moruboru.png","flame.png","koumori.png","nezumi.png",
-            "mimic.png","ldog.png","majisyan.png","dragon.png","slime-c2.png","kidsdragon.png"
-        ];
+
 const monsterNames = {
 
     // 森
@@ -398,6 +398,8 @@ function startGametitle(){
     openingBgm.play();
 
     openingEvent = true;
+document.querySelector(".controller").style.display = "flex";
+document.querySelector(".actionButtons").style.display = "flex";
 
 startEvent([
     {
@@ -422,201 +424,7 @@ startEvent([
     }
 ]);
 }
-function startEvent(messages, friend=null){
 
- // 他のBGM停止
- 
- shopBgm.pause();
-shopBgm.currentTime = 0;
- fieldBgm.pause(); 
- battleBgm.pause(); 
- bossBgm.pause();
-// 城の中以外では城BGMを止める
-if(!castleMode){
-    castleBgm.pause();
-}
-
-if(
-    !openingEvent &&
-    !innEvent &&
-    !castleMode &&
-    !guardianEvent
-){
-    eventBgm.currentTime = 0;
-    eventBgm.play();
-}
-
-document.querySelector(".crossKey").style.display = "none";
-    eventMode = true;
-document.getElementById("skillButtons").style.display = "none";
-document.getElementById("iceBtn").style.display = "none";
-    eventMessages = messages;
-    eventIndex = 0;
-
-    joinFriend = friend;
-
-    document.getElementById("field-screen").style.display = "none";
-    document.getElementById("game-container").style.display = "block";
-
-    document.getElementById("options").style.display = "none";
-
-    showEventMessage();
-
-}
-function showEventMessage(){
-
-    const msg = eventMessages[eventIndex];
-
-    if(openingEvent || fullScreenEvent){
-
-        document.getElementById("monster-img").style.display = "none";
-
-        document.getElementById("monster-area").style.backgroundImage =
-            `url('${msg.img}')`;
-
-}else{
-
-    if(castleMode){
-        monsterArea.style.backgroundImage =
-        "url('img/castle_bg.jpg')";
-    }
-    else if(currentMapIndex === 29){
-        monsterArea.style.backgroundImage =
-        "url('img/bg_boss.jpg')";
-    }
-    else{
-        updateMonsterBackground();
-    }
-
-    document.getElementById("monster-img").style.display = "block";
-    document.getElementById("monster-img").src = msg.img;
-}
-
-    textEl.innerHTML = msg.text;
-}
-
-function closeEvent(){
-    
-    eventBgm.pause();
-    eventBgm.currentTime = 0;
-
-    innBgm.pause();
-    innBgm.currentTime = 0;
-document.getElementById("iceBtn").style.display = "none";
-    innEvent = false;
-
-    winBgm.pause();
-    winBgm.currentTime = 0;
-    eventMode = false;
-
-
-if(joinFriend && party.length < friendSets.length){
-
-    party.push({
-        x: player.x,
-        y: player.y
-    });
-
-    if(joinFriend === "otter"){
-        healCount = 1;
-    }
-
-    if(joinFriend === "orca"){
-        changeCount = 1;
-    }
-
-if(joinFriend === "dolphin"){
-    hintCount = 1;
-}
-if(joinFriend === "buncho"){
-    hasBunchoMage = true;
-}
-    joinFriend = null;
-}
-
-    // 最終イベント後ならボス戦
-if(startBossAfterEvent){
-
-guardianBgm.pause();
-fieldBgm.pause();
-castleBgm.pause();   // ←追加
-
-fieldBgm.currentTime = 0;
-castleBgm.currentTime = 0;
-
-bossBgm.currentTime = 0;
-bossBgm.play();
-
-    startBossAfterEvent = false;
-     inBattle = true; 
-    bossBattle = true;
-    bossStreak = 0;
-
-    updateMonsterBackground();  
-
-    document.getElementById("field-screen").style.display = "none";
-    document.getElementById("game-container").style.display = "block";
-
-    document.getElementById("skillButtons").style.display = "flex";
-
-    document.getElementById("healBtn").style.display =
-        party.length >= 1 ? "block" : "none";
-
-    document.getElementById("changeBtn").style.display =
-        party.length >= 2 ? "block" : "none";
-
-    document.getElementById("hintBtn").style.display =
-        party.length >= 3 ? "block" : "none";
-
-    document.getElementById("healBtn").disabled = false;
-    document.getElementById("changeBtn").disabled = false;
-    document.getElementById("hintBtn").disabled = false;
-
-    document.getElementById("healBtn").innerHTML = "🦦 回復";
-    document.getElementById("changeBtn").innerHTML = "🐋 問題変更";
-    document.getElementById("hintBtn").innerHTML = "🐬 2択ヒント";
-
-    document.getElementById("options").style.display = "grid";
-
-    loadQuestion();
-
-    return;
-}
-    document.getElementById("options").style.display = "grid";
-    document.getElementById("skillButtons").style.display = "flex"
-document.querySelector(".crossKey").style.display = "flex";
-    document.getElementById("game-container").style.display = "none";
-    document.getElementById("field-screen").style.display = "block";
-   // フィールドへ戻ったらBGM再生
-if(!castleMode && !bossBattle){
-    fieldBgm.currentTime = 0;
-    fieldBgm.play();
-}
-
-if(openingEvent){
-    openingEvent = false;
-
-    openingBgm.pause();
-    openingBgm.currentTime = 0;
-
-    startCastle();
-    return;
-}
-
-document.getElementById("monster-img").style.display = "block";
-
-updateMapTiles();
-updateMonsterBackground();
-if(!startBossAfterEvent){
-    guardianEvent = false;
-}
-fullScreenEvent = false;
-updateFieldStatus();
-
-draw();
-
-
-}
 function startCastle(){
 fieldBgm.pause();
 openingBgm.pause();
@@ -689,252 +497,12 @@ function getHitRate(){
 
     return hitRate;
 }
-function triggerAreaEvent(){
-
-    // 同じイベントを何回も出さない
-    if(eventDone[currentMapIndex]) return;
-
-    switch(currentMapIndex){
-
-        case 6:
-
-            eventDone[currentMapIndex] = true;
-startEvent([
-    {
-        img:"img/otter.png",
-        text:"カワウソ：ペンギン！ そんなにいそいでどこへ<ruby>行<rt>い</rt></ruby>くの？"
-    },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン：<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しに<ruby>旅<rt>たび</rt></ruby>へ<ruby>行<rt>い</rt></ruby>くんだ。<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うためにね。"
-    },
-    {
-        img:"img/otter.png",
-        text:"カワウソ：そうだったのか！ ぼくも<ruby>町<rt>まち</rt></ruby>のみんなを<ruby>助<rt>たす</rt></ruby>けたい！ いっしょに<ruby>連<rt>つ</rt></ruby>れていってよ！"
-    },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン：もちろん！ <ruby>仲間<rt>なかま</rt></ruby>がいると<ruby>心強<rt>こころづよ</rt></ruby>いよ。"
-    },
-    {
-        img:"img/otter.png",
-        text:"カワウソ：よーし！ みんなのためにがんばるぞ！"
-    },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン・カワウソ：おー！"
-    },
-    {
-        img:"img/otterpenguin.png",
-        text:"♪カワウソが<ruby>仲間<rt>なかま</rt></ruby>になった！"
-    }
-],"otter");
-            break;
-
-        case 12:
-
-            eventDone[currentMapIndex] = true;
-
-           startEvent([
-{
-    img:"img/otter.png",
-    text:"カワウソ：ペンギン、そろそろおなかがすいてきたね。"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：うん…。<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>す<ruby>旅<rt>たび</rt></ruby>は、なかなかたいへんだな。"
-},
-{
-    img:"img/orca.png",
-    text:"シャチ：やあ！ きみたち、どうしたの？"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：ぼくたちは<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うために、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しているんだ。"
-},
-{
-    img:"img/orca.png",
-    text:"それはたいへんだね！ まずはこれを<ruby>食<rt>た</rt></ruby>べて<ruby>元気<rt>げんき</rt></ruby>をだしてよ。"
-},
-{
-    img:"img/otter.png",
-    text:"うわー！ おいしそう！"
-},
-{
-    img:"img/penguin.png",
-    text:"ありがとう！ これでまた<ruby>頑張<rt>がんば</rt></ruby>れそうだよ。"
-},
-{
-    img:"img/orca.png",
-    text:"みんなのために<ruby>旅<rt>たび</rt></ruby>をしているなんて、すごいね。"
-},
-{
-    img:"img/orca.png",
-    text:"よかったら、ぼくもいっしょに<ruby>戦<rt>たたか</rt></ruby>わせてくれない？"
-},
-{
-    img:"img/penguin.png",
-    text:"もちろん！ <ruby>仲間<rt>なかま</rt></ruby>がふえるのはとてもうれしいよ！"
-},
-{
-    img:"img/otter.png",
-    text:"これで<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなにもっと<ruby>近<rt>ちか</rt></ruby>づけるね！"
-},
-{
-    img:"img/orca.png",
-    text:"よーし！ みんなで<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>おう！"
-},
-{
-    img:"img/orca.png",
-    text:"♪シャチが<ruby>仲間<rt>なかま</rt></ruby>になった！"
-}
-],"orca");
-
-            break;
-
-        case 18:
-
-            eventDone[currentMapIndex] = true;
-startEvent([
-{
-    img:"img/dolphin.png",
-    text:"イルカ：やあ！ <ruby>君<rt>きみ</rt></ruby>たち、どこへ<ruby>行<rt>い</rt></ruby>くんだい？"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：ぼくたちは<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うために、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しているんだ！"
-},
-{
-    img:"img/otter.png",
-    text:"カワウソ：そのおさかなを<ruby>見<rt>み</rt></ruby>つけると、どんな<ruby>願<rt>ねが</rt></ruby>いもかなうって<ruby>言<rt>い</rt></ruby>われているんだよ。"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：<ruby>伝説<rt>でんせつ</rt></ruby>のおさかな！？ それはすごいね！"
-},
-{
-    img:"img/orca.png",
-    text:"シャチ：ぼくたちは、みんなを<ruby>助<rt>たす</rt></ruby>けるために<ruby>旅<rt>たび</rt></ruby>をしているんだ。"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：<ruby>実<rt>じつ</rt></ruby>はぼくも、そのうわさを<ruby>聞<rt>き</rt></ruby>いたことがあるよ。"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：ひとりで<ruby>探<rt>さが</rt></ruby>していたんだけど、なかなか<ruby>見<rt>み</rt></ruby>つからなくてね。"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：それなら、ぼくたちと<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>探<rt>さが</rt></ruby>さない？"
-},
-{
-    img:"img/otter.png",
-    text:"カワウソ：<ruby>仲間<rt>なかま</rt></ruby>が<ruby>増<rt>ふ</rt></ruby>えれば、きっと<ruby>見<rt>み</rt></ruby>つけられるよ！"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：<ruby>本当<rt>ほんとう</rt></ruby>かい！？ ぜひ<ruby>仲間<rt>なかま</rt></ruby>にしてほしい！"
-},
-{
-    img:"img/orca.png",
-    text:"シャチ：もちろんだ！"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：みんなで<ruby>力<rt>ちから</rt></ruby>を<ruby>合<rt>あ</rt></ruby>わせて、<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>おう！"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：よーし！ <ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>見<rt>み</rt></ruby>つけるぞ！"
-},
-{
-    img:"img/dolphin.png",
-    text:"♪イルカが<ruby>仲間<rt>なかま</rt></ruby>になった！"
-}
-],"dolphin");
-            break;
-case 24:
-
-    eventDone[currentMapIndex] = true;
-
-    startEvent([
-    {
-    img:"img/orca.png",
-    text:"シャチ：あれを見て！ <ruby>火山<rt>かざん</rt></ruby>がふんかしている！"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：<ruby>熱気<rt>ねっき</rt></ruby>がすごい…。ぼくたち、ここまで来たんだね。"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：きっと<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなは、この<ruby>先<rt>さき</rt></ruby>にいる！"
-},
-{
-    img:"img/allfriends.png",
-    text:"みんなで<ruby>最後<rt>さいご</rt></ruby>の<ruby>冒険<rt>ぼうけん</rt></ruby>へ！"
-},
-    {
-        img:"img/allfriends.png",
-        text:"みんな：おー！！"
-    }
-    ]);
-
-    break;
-
-case 29:
-
-eventDone[currentMapIndex] = true;
-fullScreenEvent = true;
-startEvent([
-{
-    img:"img/temple_event.jpg",
-    text:"伝説のおさかなが眠る神殿に到着した。"
-},
-{
-    img:"img/temple_event.jpg",
-    text:"神殿の奥から強大な気配を感じる…。"
-}
-]);
-
-break;
-}
-}
-function getIceSword(){
-
-    if(hasIceSword) return;
-
-    hasIceSword = true;
-    freezeCount = 1;
-fullScreenEvent = true;
-startEvent([
-    {
-        img:"img/ice_temple.jpg",
-        text:"<ruby>吹雪<rt>ふぶき</rt></ruby>の<ruby>中<rt>なか</rt></ruby>で<ruby>古代<rt>こだい</rt></ruby>の<ruby>氷<rt>こおり</rt></ruby>の<ruby>神殿<rt>しんでん</rt></ruby>を<ruby>発見<rt>はっけん</rt></ruby>した。"
-    },
-    {
-        img:"img/ice_sword1.jpg",
-        text:"<ruby>青<rt>あお</rt></ruby>く<ruby>輝<rt>かがや</rt></ruby>く<ruby>剣<rt>けん</rt></ruby>が<ruby>祭壇<rt>さいだん</rt></ruby>に<ruby>刺<rt>さ</rt></ruby>さっている。"
-    },
-    {
-        img:"img/ice_sword.jpg",
-        text:"ペンギンはアイスソードを<ruby>抜<rt>ぬ</rt></ruby>いた！"
-    },
-    {
-        img:"img/ice_sword2.jpg",
-        text:"❄️ アイスソードを<ruby>手<rt>て</rt></ruby>に<ruby>入<rt>い</rt></ruby>れた！"
-    },
-    {
-        img:"img/ice_sword2.jpg",
-        text:"<ruby>戦闘中<rt>せんとうちゅう</rt></ruby>に1<ruby>回<rt>かい</rt></ruby>だけ『フリーズストーム』が<ruby>使<rt>つか</rt></ruby>えるようになった！"
-    }
-]);
-}
 function startGame(level) {
 document.getElementById("monster-img").style.display = "block";
 document.querySelector(".crossKey").style.display = "none";
 document.getElementById("skillButtons").style.display = "none";
+ document.getElementById("area-name").style.display = "block";
+ document.getElementById("area-name").innerText = getAreaName();
 fieldBgm.pause();
 shopBgm.pause();
 shopBgm.currentTime = 0;
@@ -947,10 +515,13 @@ battleBgm.play();
     document.getElementById("game-container").style.display = "block";
     document.getElementById("iceBtn").style.display =
     hasIceSword ? "block" : "none"; 
-if(hasIceSword){
+if(hasIceSword && freezeCount > 0){
 
-    document.getElementById("iceBtn").style.display = "block";
 
+   document.getElementById("iceBtn").style.display =
+(hasIceSword && freezeCount > 0)
+? "block"
+: "none";
 document.getElementById("iceBtn").disabled =
 freezeCount <= 0;
 
@@ -1363,146 +934,6 @@ function nextEnding(){
 
     showEndingScene();
 }
-function generateMap(index){
-
-    const rows = 13;
-    const cols = 13;
-
-    const map = [];
-
-    for(let y=0;y<rows;y++){
-
-        map[y] = [];
-
-        for(let x=0;x<cols;x++){
-
-            if(
-                y===0 ||
-                y===rows-1 ||
-                x===0 ||
-                x===cols-1
-            ){
-                map[y][x] = 1;
-            }else{
-                map[y][x] = 0;
-            }
-        }
-    }
-
-    // 木配置
-    const treeCount =
-        Math.floor(Math.random()*10)+20;
-
-    for(let i=0;i<treeCount;i++){
-
-        const x = Math.floor(Math.random()*11)+1;
-        const y = Math.floor(Math.random()*11)+1;
-
-        if(!(x===1 && y===1)){
-
-            map[y][x] = 2;
-        }
-    }
-
-// 階段配置
-let sx, sy;
-
-do{
-    sx = Math.floor(Math.random()*11)+1;
-    sy = Math.floor(Math.random()*11)+1;
-}
-while(map[sy][sx] !== 0);
-
-map[sy][sx] = 3;
-
-// ショップ配置
-
-if(index < 29 && Math.random() < 0.3){
-
-    let shopX, shopY;
-
-    do{
-        shopX = Math.floor(Math.random()*11)+1;
-        shopY = Math.floor(Math.random()*11)+1;
-    }
-    while(map[shopY][shopX] !== 0);
-
-    map[shopY][shopX] = 9;
-}
-// 宝箱配置
-const chestCount =
-Math.floor(Math.random() * 3) + 1; // 1～3個
-
-for(let i=0; i<chestCount; i++){
-
-    let cx, cy;
-
-    do{
-        cx = Math.floor(Math.random()*11)+1;
-        cy = Math.floor(Math.random()*11)+1;
-    }
-    while(map[cy][cx] !== 0);
-
-    map[cy][cx] = 10;
-}
-    // 5階ごとに宿配置
-    if(
-        (index + 1) % 5 === 0 &&
-        (index + 1) < 30
-    ){
-
-        let ix, iy;
-
-        do{
-            ix = Math.floor(Math.random()*11)+1;
-            iy = Math.floor(Math.random()*11)+1;
-        }
-        while(map[iy][ix] !== 0);
-
-        map[iy][ix] = 4;
-    }
-if(index === 29){
-
-   const bossMap = [
-
-[1,1,1,1,1,1,1,1,1,1,1,1,1],
-[1,0,0,0,2,0,6,0,2,0,0,0,1],
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-[1,0,2,0,0,0,0,0,0,0,2,0,1],
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-[1,0,0,0,2,0,0,0,2,0,0,0,1],
-
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-[1,0,2,0,0,0,0,0,0,0,2,0,1],
-
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-[1,0,0,0,2,0,0,0,2,0,0,0,1],
-
-[1,0,0,0,0,0,0,0,0,0,0,0,1],
-
-[1,1,1,1,1,1,1,1,1,1,1,1,1]
-
-];
-
-    return bossMap;
-}
-    
-
-
-    // スタート周辺を空ける
-    map[1][1] = 0;
-    map[1][2] = 0;
-    map[2][1] = 0;
-    map[2][2] = 0;
-
-    return map;
-}
-
 
 
 let currentMapIndex = 0;
@@ -1517,244 +948,6 @@ templeMapBg.src = "img/temple_map_bg.png";
 
 const guardianMapImg = new Image();
 guardianMapImg.src = "guardian_map.png";
-
-function draw(){
-
-    party.forEach((friend, i) => {
-
-        const pos = trail[i];
-
-        if(pos){
-            friend.x = pos.x;
-            friend.y = pos.y;
-        }
-    });
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // 神殿背景
-    if(currentMapIndex === 29){
-
- ctx.drawImage(
-    grassImg,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-
-        );
-
-    }
-
-    // マップ描画
-    for(let y=0; y<map.length; y++){
-    for(let x=0; x<map[y].length; x++){
-
-// 城マップ
-if(castleMode){
-
-    if(y === 0 && x === 0){
-        ctx.drawImage(
-            castleBgImg,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-    }
-
-    // 王様
-    if(map[y][x] === 7){
-        ctx.drawImage(
-            castleKingImg,
-            x * tileSize,
-            y * tileSize,
-            tileSize,
-            tileSize
-        );
-    }
-
-    // 兵士
-    if(map[y][x] === 8){
-        ctx.drawImage(
-            soldierImg,
-            x * tileSize,
-            y * tileSize,
-            tileSize,
-            tileSize
-        );
-    }
-
-    // 階段
-    if(map[y][x] === 3){
-        ctx.drawImage(
-            stairsImg,
-            x * tileSize,
-            y * tileSize,
-            tileSize,
-            tileSize
-        );
-    }
-
-    continue;
-}
-
-if(currentMapIndex !== 29){
-
-    if(map[y][x] === 1)
-        ctx.drawImage(
-            wallImg,
-            x*tileSize,
-            y*tileSize,
-            tileSize,
-            tileSize
-        );
-
-}
-      // 地面を先に描画
-      if(currentMapIndex !== 29){
-        ctx.drawImage(
-            grassImg,
-            x * tileSize,
-            y * tileSize,
-            tileSize,
-            tileSize
-        );
-      }
-
-        // その上にオブジェクト
-        if(map[y][x] === 1){
-            ctx.drawImage(
-                wallImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-            );
-        }
-
-        if(map[y][x] === 2){
-            ctx.drawImage(
-                treeImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-            );
-        }
-
-        if(map[y][x] === 3){
-            ctx.drawImage(
-                stairsImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-            );
-        }
-
-        if(map[y][x] === 4){
-            ctx.drawImage(
-                innImg,
-                x * tileSize,
-                y * tileSize,
-                tileSize,
-                tileSize
-            );
-        }
-
-if(map[y][x] === 5)
-    ctx.drawImage(templeImg,x*tileSize,y*tileSize,tileSize,tileSize);
-
-if(map[y][x] === 6)
-    ctx.drawImage(
-        guardianMapImg,
-        x*tileSize,
-        y*tileSize,
-        tileSize*2,
-        tileSize*2
-    );
-if(map[y][x] === 9)
-ctx.drawImage( shopImg, x * tileSize, y * tileSize, tileSize,tileSize 
-
-);
-if(map[y][x] === 10){
-    ctx.drawImage(
-        grassImg,
-        x*tileSize,
-        y*tileSize,
-        tileSize,
-        tileSize
-    );
-
-    ctx.drawImage(
-        chestImg,
-        x*tileSize,
-        y*tileSize,
-        tileSize,
-        tileSize
-    );
-}
-}
-
-}
-
-    // 仲間描画
-    for(let i=0;i<party.length;i++){
-
-        const pos = trail[(i)];
-
-        if(!pos) continue;
-
-        const friendImage =
-            friendSets[i][direction];
-
-
-
-if(!friendImage){
-    console.log("friend image undefined", i, direction);
-    continue;
-}
-
-if(
-    !friendImage.complete ||
-    friendImage.naturalWidth === 0
-){
-    console.log("friend image load error", friendImage.src);
-    continue;
-}
-
-ctx.drawImage(
-    friendImage,
-    pos.x * tileSize,
-    pos.y * tileSize,
-    tileSize,
-    tileSize
-);
-    }
-
-    // 主人公描画
-    let heroImage = heroDown;
-
-    if(direction==="left") heroImage = heroLeft;
-    if(direction==="right") heroImage = heroRight;
-    if(direction==="up") heroImage = heroUp;
-    if(direction==="down") heroImage = heroDown;
-
-if(
-    heroImage.complete &&
-    heroImage.naturalWidth > 0
-){
-    ctx.drawImage(
-        heroImage,
-        player.x * tileSize,
-        player.y * tileSize,
-        tileSize,
-        tileSize
-    );
-}
-}
-  
 
 
 
@@ -1794,7 +987,7 @@ if(
         text:"あれ？ <ruby>宝箱<rt>たからばこ</rt></ruby>からなにか声が聞こえる…。"
     },
     {
-        img:"img/buncho_box.png",
+        img:"img/chest.png",
         text:"？？？：た、たすけてくれー！"
     },
     {
@@ -2172,6 +1365,7 @@ shopMsg("🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby>を<ruby
          },100);
 }
 function closeShop(){
+    document.getElementById("iceBtn").style.display = "none";
  document.querySelector(".crossKey").style.display = "flex";
     shopBgm.pause();
     shopBgm.currentTime = 0;
@@ -2195,6 +1389,7 @@ seShopOpen.play();
     draw();
 }
 function visitShop(){
+    document.getElementById("iceBtn").style.display = "none";
     seShopOpen.currentTime = 0;
 seShopOpen.play();
 document.querySelector(".crossKey").style.display ="none";
@@ -2257,48 +1452,67 @@ function showShopMenu(){
         </button>
     `;
 }
-function startBossEvent(){
-guardianEvent = true;
-    if(eventDone["guardian"]) return;
 
-    eventDone["guardian"] = true;
+function startInnRumorEvent(){
 
-     eventBgm.pause();
-    eventBgm.currentTime = 0;
-    startBossAfterEvent = true;
-    fieldBgm.pause(); 
-    fieldBgm.currentTime = 0;
+    const rumors = [
 
-    guardianBgm.currentTime = 0;
-    guardianBgm.play();
+        [
+            {
+                img:"img/orca_husband.jpg",
+                text:"<ruby>水色<rt>みずいろ</rt></ruby>シャチ：<ruby>旅<rt>たび</rt></ruby>の人かい？ ゆっくり休めたかな。"
+            },
+            {
+                img:"img/orca_wife.jpg",
+                text:"ピンクシャチ：そういえば、こんな話を聞いたわ。"
+            },
+            {
+                img:"img/orca_couple.jpg",
+                text:"『<ruby>伝説<rt>でんせつ</rt></ruby>の<ruby>氷<rt>こおり</rt></ruby>の<ruby>剣<rt>けん</rt></ruby>が、<ruby>雪原<rt>せつげん</rt></ruby>のどこかに<ruby>眠<rt>ねむ</rt></ruby>っているらしいよ。』"
+            },
+                        {
+                img:"img/orca_wife.jpg",
+                text:"<ruby>時間<rt>じかん</rt></ruby>があったら、<ruby>探<rt>さが</rt></ruby>してみてね。"
+            },
+                                    {
+                img:"img/orca_husband.jpg",
+                text:"それじゃあいってらっしゃい。"
+            }
+        ],
 
-    startEvent([
+        [
+             {
+                img:"img/orca_husband.jpg",
+                text:"<ruby>水色<rt>みずいろ</rt></ruby>シャチ：ゆっくり休めたかい？"
+            },
+            {
+                img:"img/orca_husband.jpg",
+                text:"<ruby>水色<rt>みずいろ</rt></ruby>シャチ：<ruby>最近<rt>さいきん</rt></ruby>、<ruby>不思議<rt>ふしぎ</rt></ruby>なうわさがあるんだ。"
+            },
+            {
+                img:"img/orca_wife.jpg",
+                text:"ピンクシャチ：旅をしているなら<ruby>覚<rt>おぼ</rt></ruby>えておくといいわ。"
+            },
+            {
+                img:"img/orca_couple.jpg",
+                text:"『たまに声が聞こえる<ruby>宝箱<rt>たからばこ</rt></ruby>があるらしいよ。』"
+            },  {
+                img:"img/orca_wife.jpg",
+                text:"<ruby>時間<rt>じかん</rt></ruby>があったら、<ruby>探<rt>さが</rt></ruby>してみてね。"
+            },
+                {
+                img:"img/orca_husband.jpg",
+                text:"それじゃあいってらっしゃい。"
+            }
+        ]
 
-        {
-            img:"img/orca.png",
-            text:"シャチ：ん？ みんな、あそこを見て！"
-        },
-        {
-            img:"img/otter.png",
-            text:"カワウソ：どうしたの？"
-        },
-        {
-            img:"img/orca.png",
-            text:"シャチ：<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>にだれかいる！"
-        },
-        {
-            img:"BOSS.png",
-            text:"ガーディアン：そこで止まれ。"
-        },
-        {
-            img:"BOSS.png",
-            text:"私は<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>守<rt>まも</rt></ruby>るガーディアンだ。"
-        },
-        {
-            img:"BOSS.png",
-            text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを手にする<ruby>資格<rt>しかく</rt></ruby>があるか<ruby>試<rt>ため</rt></ruby>してやろう！"
-        }
-    ]);
+    ];
+
+    fullScreenEvent = true;
+
+    startEvent(
+        rumors[Math.floor(Math.random() * rumors.length)]
+    );
 }
 let trail = [];
 let floor = 1;
@@ -2339,75 +1553,6 @@ function visitInn(){
     map[player.y][player.x] = 0;
 }
 
-function nextArea(){
- inBattle = false
-    console.log("次のエリア");
-
- document.getElementById("game-container").style.display="none";
-    document.getElementById("field-screen").style.display="block";
-
-    floor++;
-    currentMapIndex++;
-
-// イベント発生
-
-
-
-    if(currentMapIndex >= maps.length){
-        alert("全30エリアクリア！");
-        location.reload();
-        return;
-    }
-
-    map = maps[currentMapIndex];
-
-        // 先にリセット
-        player.x = 1;
-        player.y = 1;
-
-        trail = [];
-
-        for(let i = 0; i < (party.length + 1) * 5;
-        i++){
-            trail.push({
-                x: player.x,
-                y: player.y
-            });
-        }
-        party.forEach(friend=>{
-            friend.x = player.x;
-            friend.y = player.y;
-        });
-    triggerAreaEvent();
-    if(eventMode){
-    return;
-    }   
-    updateMapTiles();
-    updateMonsterBackground();
-
-    // プレイヤーの位置
-    player.x = 1;
-    player.y = 1;
-
-    // trailを初期化
-    trail = [];
-
-    for(let i = 0; i < (party.length + 1) * 5; i++){
-        trail.push({
-            x: player.x,
-            y: player.y
-        });
-    }
-
-    // 仲間も同じ位置へ
-    party.forEach(friend=>{
-        friend.x = player.x;
-        friend.y = player.y;
-    });
-updateFieldStatus();
-    draw();
-}
-
 document.addEventListener("keydown",e=>{
 
     if(e.key==="ArrowUp") movePlayer(0,-1);
@@ -2419,40 +1564,6 @@ document.addEventListener("keydown",e=>{
 
 
 
-
-function updateMapTiles(){
-
-    if(currentMapIndex < 6){
-
-        grassImg.src = "img/grass_forest.png";
-        treeImg.src = "img/tree_forest.png";
-    }
-    else if(currentMapIndex < 12){
-
-        grassImg.src = "img/grass_cave.png";
-        treeImg.src = "img/rock.png";
-    }
-    else if(currentMapIndex < 18){
-
-        grassImg.src = "img/grass_desert.png";
-        treeImg.src = "img/cactus.png";
-    }
-    else if(currentMapIndex < 24){
-
-        grassImg.src = "img/snow.png";
-        treeImg.src = "img/ice.png";
-    }
-    else if(currentMapIndex === 29){
-
-        grassImg.src = "img/temple_floor.png";
-        treeImg.src = "img/pillar.png";
-    }
-    else{
-
-        grassImg.src = "img/demonfloor.png";
-        treeImg.src = "img/lava.png";
-    }
-}
 
 
 
@@ -2621,6 +1732,39 @@ if(currentMapIndex === 29){
     }
 }
 
+function showCutin(img,color="#00ffff"){
+
+    const cutin =
+    document.getElementById("cutin");
+
+    const cutinImg =
+    document.getElementById("cutinImg");
+
+    cutinImg.src = img;
+
+    // フラッシュ再生
+    cutin.classList.remove("flash");
+    void cutin.offsetWidth;
+    cutin.classList.add("flash");
+
+    // カットイン再生リセット
+    cutinImg.style.animation = "none";
+    void cutinImg.offsetWidth;
+    cutinImg.style.animation =
+        "cutinAppear .6s ease-out";
+
+    // オーラ色
+    cutinImg.style.filter =
+        `drop-shadow(0 0 20px ${color})
+         drop-shadow(0 0 50px ${color})
+         drop-shadow(0 0 90px white)`;
+
+    cutin.style.display = "flex";
+
+    setTimeout(()=>{
+        cutin.style.display = "none";
+    },1000);
+}
 
 function getWinImage(){
 
@@ -2991,8 +2135,11 @@ function getExpReward(){
     return 60;
 }
 function returnToField(){
+    document.getElementById("skillButtons").style.display = "none";
     winBgm.pause();
     winBgm.currentTime = 0;
+
+    
     fieldBgm.currentTime = 0;
     fieldBgm.play();
     inBattle = false;
@@ -3026,6 +2173,7 @@ function useHeal(){
         return;
     }
 
+
     const oldText =
     textEl.innerHTML;
 
@@ -3035,7 +2183,15 @@ function useHeal(){
     seHeal.play();
 
     updateStats();
+showCutin("img/skilcutin/cutin_otter.png","#00ff88");
 
+monsterArea.classList.remove("healFlash");
+void monsterArea.offsetWidth;
+monsterArea.classList.add("healFlash");
+
+setTimeout(()=>{
+    monsterArea.classList.remove("healFlash");
+},1000);
     textEl.innerHTML =
     "🦦 カワウソがホタテクッキーをみんなに<ruby>配<rt>くば</rt></ruby>った！<br>HPが30回復した！";
 
@@ -3068,6 +2224,13 @@ function changeQuestionSkill(){
 
 document.getElementById("changeBtn").innerHTML =
 `🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby> (${changeCount})`;
+
+showCutin("img/skilcutin/cutin_orca.png","#aa00ff");
+monsterArea.classList.add("changeFlash");
+
+setTimeout(()=>{
+    monsterArea.classList.remove("changeFlash");
+},800);
 
 textEl.innerHTML =
 "🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
@@ -3124,6 +2287,12 @@ document.getElementById("hintBtn").disabled = true;
 const oldQuestion =
 textEl.innerHTML;
 
+showCutin("img/skilcutin/cutin_dolphin.png","#00e5ff");
+monsterArea.classList.add("hintFlash");
+
+setTimeout(()=>{
+    monsterArea.classList.remove("hintFlash");
+},1000);
 textEl.innerHTML =
 "🐬 イルカがヒントをくれた！";
 
@@ -3133,7 +2302,25 @@ setTimeout(()=>{
 },1000);
 }
 function useFreezeStorm(){
+const effect =
+document.getElementById("skillEffect");
 
+const snow =
+document.getElementById("snowLayer");
+
+effect.style.display = "block";
+
+effect.classList.add("freezeEffect");
+snow.classList.add("freezeSnow");
+
+setTimeout(()=>{
+
+    effect.classList.remove("freezeEffect");
+    snow.classList.remove("freezeSnow");
+
+    effect.style.display = "none";
+
+},1500);
     if(freezeCount <= 0){
         return;
     }
@@ -3168,6 +2355,8 @@ function useFreezeStorm(){
 
         battleWin = true;
 
+        document.getElementById("skillButtons").style.display = "none";
+        document.getElementById("options").style.display = "block";
         updateStats();
 
         document.getElementById("monster-img").style.display =
