@@ -150,14 +150,16 @@
 <div class="options-grid" id="options" style="display:none;">
  
 </div>
-</div>
-
-
-
-
 
 </div>
 
+
+
+
+
+</div>
+<div>
+<div>
 <button id="sound-toggle" onclick="toggleSound()">🔊 SOUND ON</button>
 <audio id="se-heal">
     <source src="audio/se_kaihuku02.mp3" type="audio/mpeg">
@@ -970,10 +972,7 @@ if(endingIndex >= endingScenes.length){
 
     showEndingScene();
 }
-movie.onplay = function(){
-    endingBgm.pause();
-    endingBgm.currentTime = 0;
-};
+
 
 let currentMapIndex = 0;
 let map = maps[currentMapIndex];
@@ -2585,6 +2584,13 @@ if(currentMapIndex === 29){
 <video id="endingVideo" width="90%" controls autoplay>
     <source src="img/movie/ending.mp4" type="video/mp4">
 </video>
+</div>
+<div id="ad-banner">
+
+    <a href="https://rpx.a8.net/svt/ejp?a8mat=4B7X57+82JKRE+2HOM+67C4H&rakuten=y&a8ejpredirect=http%3A%2F%2Fhb.afl.rakuten.co.jp%2Fhgc%2F0ea62065.34400275.0ea62066.204f04c0%2Fa26071033823_4B7X57_82JKRE_2HOM_67C4H%3Fpc%3Dhttp%253A%252F%252Fwww.rakuten.co.jp%252F%26m%3Dhttp%253A%252F%252Fm.rakuten.co.jp%252F" rel="nofollow">
+<img src="http://hbb.afl.rakuten.co.jp/hsb/0eb4bbbc.f6bc911e.0eb4bbaa.95151395/" border="0"></a>
+<img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B7X57+82JKRE+2HOM+67C4H" alt="">
+
 </div>
 
     </body>
