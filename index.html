@@ -373,6 +373,7 @@ let castleMode = false;
 let hasBunchoMage = false;
 let guardianEvent = false;
 let pendingLevelUp = null;
+let endingMoviePlayed = false;
 
     // イベント
 function startGametitle(){
@@ -834,7 +835,7 @@ heroImg.src = "img/hero.png";
 
 
 const stairsImg = new Image();
-stairsImg.src = "img/stairs.png";
+stairsImg.src = "img/stairs1.png";
 
 
 const bonusImg = new Image();
@@ -921,20 +922,58 @@ function nextEnding(){
 
     endingIndex++;
 
-    if(endingIndex >= endingScenes.length){
+if(endingIndex >= endingScenes.length){
 
-        textEl.innerHTML =
-        "プレイしていただき、ありがとうございました！";
+    // まだムービーを流していない
+    if(!endingMoviePlayed){
 
-        document.getElementById("options").innerHTML =
-        "<button onclick='location.reload()'>もう一度遊ぶ</button>";
+        endingMoviePlayed = true;
+
+        document.getElementById("monster-area").style.display = "none";
+        document.getElementById("message-window").style.display = "none";
+        document.getElementById("options").style.display = "none";
+
+        const movieArea =
+        document.getElementById("endingMovie");
+
+        const movie =
+        document.getElementById("endingVideo");
+
+        movieArea.style.display = "flex";
+
+        // エンディングBGMを止める
+        endingBgm.pause();
+        endingBgm.currentTime = 0;
+
+        movie.currentTime = 0;
+        movie.play();
+
+        movie.onended = function(){
+
+            movieArea.style.display = "none";
+
+            textEl.innerHTML =
+            "プレイしていただき、ありがとうございました！";
+
+            document.getElementById("monster-area").style.display = "block";
+            document.getElementById("message-window").style.display = "block";
+
+            document.getElementById("options").innerHTML =
+            "<button onclick='location.reload()'>もう一度遊ぶ</button>";
+        };
 
         return;
     }
 
-    showEndingScene();
+    return;
 }
 
+    showEndingScene();
+}
+movie.onplay = function(){
+    endingBgm.pause();
+    endingBgm.currentTime = 0;
+};
 
 let currentMapIndex = 0;
 let map = maps[currentMapIndex];
@@ -1207,7 +1246,7 @@ if(
     currentMapIndex >= 18 &&
     currentMapIndex < 24 &&
     !hasIceSword &&
-    Math.random() < 0.05
+    Math.random() < 0.03
 ){
     getIceSword();
     return;
@@ -2173,40 +2212,50 @@ function useHeal(){
         return;
     }
 
+    const oldText = textEl.innerHTML;
 
-    const oldText =
-    textEl.innerHTML;
+    hp = Math.min(hp + 30, maxHp);
 
-   hp = Math.min(hp + 30, maxHp);
+    healCount--;
+
+    document.getElementById("healBtn").innerHTML =
+    `🦦 <ruby>回復<rt>かいふく</rt></ruby> (${healCount})`;
+
+    document.getElementById("healBtn").disabled = true;
 
     seHeal.currentTime = 0;
     seHeal.play();
 
     updateStats();
-showCutin("img/skilcutin/cutin_otter.png","#00ff88");
 
-monsterArea.classList.remove("healFlash");
-void monsterArea.offsetWidth;
-monsterArea.classList.add("healFlash");
+    // カットイン
+    showCutin(
+        "img/skilcutin/cutin_otter.png",
+        "#00ff88"
+    );
 
-setTimeout(()=>{
-    monsterArea.classList.remove("healFlash");
-},1000);
-    textEl.innerHTML =
-    "🦦 カワウソがホタテクッキーをみんなに<ruby>配<rt>くば</rt></ruby>った！<br>HPが30回復した！";
-
-    healCount--;
-
-    document.getElementById("healBtn").innerHTML =
-`🦦 <ruby>回復<rt>かいふく</rt></ruby> (${healCount})`;
-
-    document.getElementById("healBtn").disabled = true;
-
+    // カットイン後に演出
     setTimeout(()=>{
+
+        monsterArea.classList.remove("healFlash");
+        void monsterArea.offsetWidth;
+        monsterArea.classList.add("healFlash");
+
         textEl.innerHTML =
-        oldText;
+        "🦦 カワウソがホタテクッキーをみんなに<ruby>配<rt>くば</rt></ruby>った！<br>HPが30回復した！";
+
+        setTimeout(()=>{
+            monsterArea.classList.remove("healFlash");
+        },1000);
+
     },1000);
+
+    // 演出終了後に問題へ戻る
+    setTimeout(()=>{
+        textEl.innerHTML = oldText;
+    },2500);
 }
+
 function changeQuestionSkill(){
 
     if(changeCount <= 0){
@@ -2219,28 +2268,43 @@ function changeQuestionSkill(){
         return;
     }
 
-   changeCount--;
+    changeCount--;
+
     document.getElementById("changeBtn").disabled = true;
 
-document.getElementById("changeBtn").innerHTML =
-`🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby> (${changeCount})`;
+    document.getElementById("changeBtn").innerHTML =
+    `🐋 <ruby>問題変更<rt>もんだいへんこう</rt></ruby> (${changeCount})`;
 
-showCutin("img/skilcutin/cutin_orca.png","#aa00ff");
-monsterArea.classList.add("changeFlash");
-
-setTimeout(()=>{
-    monsterArea.classList.remove("changeFlash");
-},800);
-
-textEl.innerHTML =
-"🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
     seSkill1.currentTime = 0;
     seSkill1.play();
+
+    // カットイン
+    showCutin(
+        "img/skilcutin/cutin_orca.png",
+        "#aa00ff"
+    );
+
+    // カットイン後に演出
+    setTimeout(()=>{
+
+        monsterArea.classList.remove("changeFlash");
+        void monsterArea.offsetWidth;
+        monsterArea.classList.add("changeFlash");
+
+        textEl.innerHTML =
+        "🐋 シャチが<ruby>問題<rt>もんだい</rt></ruby>を<ruby>流<rt>なが</rt></ruby>した！";
+
+        setTimeout(()=>{
+            monsterArea.classList.remove("changeFlash");
+        },800);
+
+    },1000);
+
+    // 演出後に新しい問題
     setTimeout(()=>{
         loadQuestion();
-    },500);
-}
-function useHint(){
+    },2000);
+}function useHint(){
 
     if(hintCount <= 0){
         alert("ヒントは使えません");
@@ -2251,112 +2315,135 @@ function useHint(){
         alert("戦闘中のみ使用できます");
         return;
     }
+
     seSkill2.currentTime = 0;
     seSkill2.play();
 
-    const buttons =
-    document.querySelectorAll("#options button");
+    hintCount--;
 
-    let wrongButtons = [];
+    document.getElementById("hintBtn").innerHTML =
+    `🐬 ヒント (${hintCount})`;
 
-    buttons.forEach(btn=>{
+    document.getElementById("hintBtn").disabled = true;
 
-        if(btn.innerText !== currentAnswer){
-            wrongButtons.push(btn);
+    const oldQuestion = textEl.innerHTML;
+
+    // カットイン
+    showCutin(
+        "img/skilcutin/cutin_dolphin.png",
+        "#00e5ff"
+    );
+
+    // カットイン後にヒント発動
+    setTimeout(()=>{
+
+        const buttons =
+        document.querySelectorAll("#options button");
+
+        let wrongButtons = [];
+
+        buttons.forEach(btn=>{
+
+            if(btn.innerText !== currentAnswer){
+                wrongButtons.push(btn);
+            }
+
+        });
+
+        wrongButtons.sort(
+            ()=>Math.random()-0.5
+        );
+
+        if(wrongButtons[0]){
+            wrongButtons[0].style.display = "none";
         }
 
-    });
+        if(wrongButtons[1]){
+            wrongButtons[1].style.display = "none";
+        }
 
-wrongButtons.sort(()=>Math.random()-0.5);
+        monsterArea.classList.remove("hintFlash");
+        void monsterArea.offsetWidth;
+        monsterArea.classList.add("hintFlash");
 
-// 不正解を2つ消す
-if(wrongButtons[0]){
-    wrongButtons[0].style.display = "none";
-}
+        textEl.innerHTML =
+        "🐬 イルカがヒントをくれた！";
 
-if(wrongButtons[1]){
-    wrongButtons[1].style.display = "none";
-}
-hintCount--;
+        setTimeout(()=>{
+            monsterArea.classList.remove("hintFlash");
+        },1000);
 
-document.getElementById("hintBtn").innerHTML =
-`🐬 ヒント (${hintCount})`;
+    },1000);
 
-document.getElementById("hintBtn").disabled = true;
-
-const oldQuestion =
-textEl.innerHTML;
-
-showCutin("img/skilcutin/cutin_dolphin.png","#00e5ff");
-monsterArea.classList.add("hintFlash");
-
-setTimeout(()=>{
-    monsterArea.classList.remove("hintFlash");
-},1000);
-textEl.innerHTML =
-"🐬 イルカがヒントをくれた！";
-
-setTimeout(()=>{
-    textEl.innerHTML =
-    oldQuestion;
-},1000);
+    // メッセージを元に戻す
+    setTimeout(()=>{
+        textEl.innerHTML = oldQuestion;
+    },2000);
 }
 function useFreezeStorm(){
-const effect =
-document.getElementById("skillEffect");
 
-const snow =
-document.getElementById("snowLayer");
+    if(freezeCount <= 0) return;
+    if(!inBattle) return;
 
-effect.style.display = "block";
-
-effect.classList.add("freezeEffect");
-snow.classList.add("freezeSnow");
-
-setTimeout(()=>{
-
-    effect.classList.remove("freezeEffect");
-    snow.classList.remove("freezeSnow");
-
-    effect.style.display = "none";
-
-},1500);
-    if(freezeCount <= 0){
-        return;
-    }
-
-    if(!inBattle){
-        return;
-    }
-    seIce.currentTime = 0;   
+    seIce.currentTime = 0;
     seIce.play();
+
     freezeCount--;
 
     document.getElementById("iceBtn").disabled = true;
-  document.getElementById("iceBtn").innerHTML =
-`❄️ FREEZE (${freezeCount})`;
+    document.getElementById("iceBtn").innerHTML =
+    `❄️ FREEZE (${freezeCount})`;
 
-    textEl.innerHTML =
-    `
-    ❄️ フリーズストーム<ruby>発動<rt>はつどう</rt></ruby>！
-    <br>
-    <ruby>吹雪<rt>ふぶき</rt></ruby>が<ruby>敵<rt>てき</rt></ruby>を<ruby>襲<rt>おそ</rt></ruby>った！
-    `;
-
+    // ペンギン氷剣カットイン
+    showCutin(
+        "img/skilcutin/cutin_penguin_ice.png",
+        "#66ffff"
+    );
+monsterArea.classList.add("freezeCharge");
+    // カットイン終了後
     setTimeout(()=>{
 
-       let reward = getExpReward();
+        const effect =
+        document.getElementById("skillEffect");
+
+        const snow =
+        document.getElementById("snowLayer");
+
+        effect.style.display = "block";
+
+        effect.classList.add("freezeEffect");
+        snow.classList.add("freezeSnow");
+
+        textEl.innerHTML =
+        `
+        ❄️ ペンギンはアイスソードをかかげた！
+        <br>
+        <ruby>必殺技<rt>ひっさつわざ</rt></ruby>
+        フリーズストーム！！
+        `;
+
+        setTimeout(()=>{
+
+            effect.classList.remove("freezeEffect");
+            snow.classList.remove("freezeSnow");
+            effect.style.display = "none";
+
+        },1500);
+
+    },1000);
+
+    // 凍結撃破
+    setTimeout(()=>{
+
+        let reward = getExpReward();
 
         if(hasBunchoMage){
             reward *= 2;
         }
 
         exp += reward;
-
         battleWin = true;
 
-        document.getElementById("skillButtons").style.display = "none";
-        document.getElementById("options").style.display = "block";
         updateStats();
 
         document.getElementById("monster-img").style.display =
@@ -2368,19 +2455,26 @@ setTimeout(()=>{
         textEl.innerHTML =
         `
         <span style="color:#8ff">
-        氷の力で敵を説得した！
-        <br>
-        経験値を ${getExpReward()} 獲得！
+        <ruby>吹雪<rt>ふぶき</rt></ruby>が
+        <ruby>敵<rt>てき</rt></ruby>を
+        <ruby>包<rt>つつ</rt></ruby>みこんだ！
+        <br><br>
+        <ruby>経験値<rt>けいけんち</rt></ruby>
+        ${reward} を
+        <ruby>獲得<rt>かくとく</rt></ruby>！
         </span>
         `;
-    document.getElementById("options").innerHTML = `
-        <img src="${getWinImage()}" class="win-image float">
-    `;
-    battleBgm.pause();
-    bossBgm.pause();
-    winBgm.currentTime = 0;
-    winBgm.play();
-    },1000);
+
+        document.getElementById("options").innerHTML =
+        `${getWinImage()}`;
+
+        battleBgm.pause();
+        bossBgm.pause();
+
+        winBgm.currentTime = 0;
+        winBgm.play();
+
+    },2500);
 }
 
 
@@ -2475,5 +2569,23 @@ if(currentMapIndex === 29){
 }
 
 </script>
+<!-- エンディングムービー -->
+<div id="endingMovie"
+     style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:black;
+        z-index:9999;
+        justify-content:center;
+        align-items:center;">
+<video id="endingVideo" width="90%" controls autoplay>
+    <source src="img/movie/ending.mp4" type="video/mp4">
+</video>
+</div>
+
     </body>
     </html>
