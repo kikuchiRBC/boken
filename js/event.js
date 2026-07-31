@@ -438,7 +438,7 @@ startEvent([
 },
 {
     img:"img/temple_event.jpg",
-    text:"<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>から強大な<ruby>気配<rt>けはい</rt></rubyを感じる…。"
+    text:"<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>から強大な<ruby>気配<rt>けはい</rt></ruby>を感じる…。"
 }
 ]);
 
