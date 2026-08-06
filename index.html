@@ -39,7 +39,7 @@
 
 
 <div id="titleScreen">
-    <video id="titleVideo" autoplay muted loop playsinline>
+    <video id="titleVideo" loop playsinline preload="none">
   <source src="audio/opening.mp4" type="video/mp4">
   </video>
 <select id="difficulty">
@@ -381,6 +381,12 @@ let endingMoviePlayed = false;
     // イベント
 function startGametitle(){
 
+    const video =
+    document.getElementById("titleVideo");
+
+    video.play().catch(()=>{});
+
+
     currentDifficulty =
     document.getElementById("difficulty").value;
 
@@ -504,6 +510,8 @@ function getHitRate(){
 function startGame(level) {
 document.getElementById("monster-img").style.display = "block";
 document.querySelector(".crossKey").style.display = "none";
+document.querySelector(".cancelBtn").style.display = "none";
+document.getElementById("monster-img").style.display = "block";
 document.getElementById("skillButtons").style.display = "none";
  document.getElementById("area-name").style.display = "block";
  document.getElementById("area-name").innerText = getAreaName();
@@ -2050,7 +2058,7 @@ function checkAnswer(selected, correct) {
 
         // モンスターを消す
         document.getElementById("monster-img").style.display = "none";
-
+        document.getElementById("iceBtn").style.display = "none";
 
         // スキルボタンを消す
         document.getElementById("skillButtons").style.display = "none";
@@ -2174,7 +2182,11 @@ function getExpReward(){
     return 60;
 }
 function returnToField(){
+    document.querySelector(".cancelBtn").style.display = "block";
     document.getElementById("skillButtons").style.display = "none";
+    
+
+
     winBgm.pause();
     winBgm.currentTime = 0;
 
@@ -2451,7 +2463,7 @@ monsterArea.classList.add("freezeCharge");
 
         document.getElementById("skillButtons").style.display =
         "none";
-
+        document.getElementById("iceBtn").style.display = "none";
         textEl.innerHTML =
         `
         <span style="color:#8ff">
