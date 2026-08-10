@@ -238,7 +238,7 @@ function triggerAreaEvent(){
 startEvent([
     {
         img:"img/otter.png",
-        text:"カワウソ：ペンギン！ そんなにいそいでどこへ<ruby>行<rt>い</rt></ruby>くの？"
+        text:"カワウソ：ペンギン！そんなにいそいでどこへ<ruby>行<rt>い</rt></ruby>くの？"
     },
     {
         img:"img/penguin.png",
@@ -246,21 +246,33 @@ startEvent([
     },
     {
         img:"img/otter.png",
-        text:"カワウソ：そうだったのか！ ぼくも<ruby>町<rt>まち</rt></ruby>のみんなを<ruby>助<rt>たす</rt></ruby>けたい！ いっしょに<ruby>連<rt>つ</rt></ruby>れていってよ！"
+        text:"カワウソ：<ruby>伝説<rt>でんせつ</rt></ruby>のおさかな……。本当にどんな願いでも<ruby>叶<rt>かな</rt></ruby>えてくれるの？"
     },
     {
         img:"img/penguin.png",
-        text:"ペンギン：もちろん！ <ruby>仲間<rt>なかま</rt></ruby>がいると<ruby>心強<rt>こころづよ</rt></ruby>いよ。"
+        text:"ペンギン：うん。そう言われているよ。"
     },
     {
         img:"img/otter.png",
-        text:"カワウソ：よーし！ みんなのためにがんばるぞ！"
+        text:"カワウソ：<ruby>実<rt>じつ</rt></ruby>はぼくの<ruby>妹<rt>いもうと</rt></ruby>が<ruby>病気<rt>びょうき</rt></ruby>なんだ"
     },
-    {
-        img:"img/penguin.png",
-        text:"ペンギン・カワウソ：おー！"
-    },
-    {
+{
+    img:"img/penguin.png",
+    text:"そうだったのか……。"
+},
+{
+    img:"img/otter.png",
+    text:"ぼくも<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなに会いたい！ 妹を<ruby>助<rt>たす</rt></ruby>けたいんだ！"
+},
+{
+    img:"img/penguin.png",
+    text:"もちろん<ruby>一緒<rt>いっしょ</rt></ruby>に行こう！"
+},
+{
+    img:"img/otter.png",
+    text:"ありがとう！<ruby>妹<rt>いもうと</rt></ruby>のためにも<ruby>頑張<rt>がんば</rt></ruby>るよ！"
+},
+ {
         img:"img/otterpenguin.png",
         text:"♪カワウソが<ruby>仲間<rt>なかま</rt></ruby>になった！"
     }
@@ -271,67 +283,66 @@ startEvent([
 
             eventDone[currentMapIndex] = true;
 
-           startEvent([
+          startEvent([
 {
-    img:"img/otter.png",
-    text:"カワウソ：ペンギン、そろそろおなかがすいてきたね。"
+    img:"img/orca.png",
+    text:"シャチ：やあ、<ruby>旅人<rt>たびびと</rt></ruby>たち。ずいぶん<ruby>疲<rt>つか</rt></ruby>れているみたいだね。"
 },
 {
     img:"img/penguin.png",
-    text:"ペンギン：うん…。<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>す<ruby>旅<rt>たび</rt></ruby>は、なかなかたいへんだな。"
+    text:"ぼくたちは<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しているんだ。"
 },
 {
     img:"img/orca.png",
-    text:"シャチ：やあ！ きみたち、どうしたの？"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：ぼくたちは<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うために、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しているんだ。"
-},
-{
-    img:"img/orca.png",
-    text:"それはたいへんだね！ まずはこれを<ruby>食<rt>た</rt></ruby>べて<ruby>元気<rt>げんき</rt></ruby>をだしてよ。"
+    text:"やっぱりか……。"
 },
 {
     img:"img/otter.png",
-    text:"うわー！ おいしそう！"
-},
-{
-    img:"img/penguin.png",
-    text:"ありがとう！ これでまた<ruby>頑張<rt>がんば</rt></ruby>れそうだよ。"
+    text:"えっ？"
 },
 {
     img:"img/orca.png",
-    text:"みんなのために<ruby>旅<rt>たび</rt></ruby>をしているなんて、すごいね。"
+    text:"<ruby>昔<rt>むかし</rt></ruby>は<ruby>海<rt>うみ</rt></ruby>も<ruby>今<rt>いま</rt></ruby>よりずっときれいだったんだ。"
 },
 {
     img:"img/orca.png",
-    text:"よかったら、ぼくもいっしょに<ruby>戦<rt>たたか</rt></ruby>わせてくれない？"
+    text:"でも<ruby>魔王<rt>まおう</rt></ruby>が<ruby>現<rt>あらわ</rt></ruby>れてから<ruby>海<rt>うみ</rt></ruby>は<ruby>荒<rt>あ</rt></ruby>れ、<ruby>多<rt>おお</rt></ruby>くの生き物が<ruby>住<rt>す</rt></ruby>めなくなってしまった。"
 },
 {
     img:"img/penguin.png",
-    text:"もちろん！ <ruby>仲間<rt>なかま</rt></ruby>がふえるのはとてもうれしいよ！"
+    text:"そんなことが……。"
+},
+{
+    img:"img/orca.png",
+    text:"ぼくの<ruby>願<rt>ねが</rt></ruby>いはただひとつ。<ruby>昔<rt>むかし</rt></ruby>みたいな美しい<ruby>海<rt>うみ</rt></ruby>を<ruby>取<rt>と</rt></ruby>り<ruby>戻<rt>もど</rt></ruby>すことなんだ。"
+},
+{
+    img:"img/orca.png",
+    text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>すなら、ぼくも<ruby>協力<rt>きょうりょく</rt></ruby>させてほしい！"
+},
+{
+    img:"img/penguin.png",
+    text:"もちろん！<ruby>仲間<rt>なかま</rt></ruby>が<ruby>増<rt>ふ</rt></ruby>えるのは<ruby>心強<rt>こころづよ</rt></ruby>いよ！"
 },
 {
     img:"img/otter.png",
-    text:"これで<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなにもっと<ruby>近<rt>ちか</rt></ruby>づけるね！"
+    text:"みんなの願いを<ruby>叶<rt>かな</rt></ruby>えるためにも<ruby>頑張<rt>がんば</rt></ruby>ろう！"
 },
 {
     img:"img/orca.png",
-    text:"よーし！ みんなで<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>おう！"
+    text:"よし！ この<ruby>海<rt>うみ</rt></ruby>を<ruby>必<rt>かなら</rt></ruby>ず<ruby>元<rt>もと</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>そう！"
 },
 {
     img:"img/orca.png",
     text:"♪シャチが<ruby>仲間<rt>なかま</rt></ruby>になった！"
 }
 ],"orca");
-
             break;
 
         case 18:
 
             eventDone[currentMapIndex] = true;
-startEvent([
+  startEvent([
 {
     img:"img/dolphin.png",
     text:"イルカ：やあ！ <ruby>君<rt>きみ</rt></ruby>たち、どこへ<ruby>行<rt>い</rt></ruby>くんだい？"
@@ -341,48 +352,72 @@ startEvent([
     text:"ペンギン：ぼくたちは<ruby>魔王<rt>まおう</rt></ruby>に<ruby>支配<rt>しはい</rt></ruby>された<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>うために、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>探<rt>さが</rt></ruby>しているんだ！"
 },
 {
-    img:"img/otter.png",
-    text:"カワウソ：そのおさかなを<ruby>見<rt>み</rt></ruby>つけると、どんな<ruby>願<rt>ねが</rt></ruby>いもかなうって<ruby>言<rt>い</rt></ruby>われているんだよ。"
+    img:"img/dolphin.png",
+    text:"イルカ：<ruby>伝説<rt>でんせつ</rt></ruby>のおさかな……。そうだったのか。"
 },
 {
     img:"img/dolphin.png",
-    text:"イルカ：<ruby>伝説<rt>でんせつ</rt></ruby>のおさかな！？ それはすごいね！"
-},
-{
-    img:"img/orca.png",
-    text:"シャチ：ぼくたちは、みんなを<ruby>助<rt>たす</rt></ruby>けるために<ruby>旅<rt>たび</rt></ruby>をしているんだ。"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：<ruby>実<rt>じつ</rt></ruby>はぼくも、そのうわさを<ruby>聞<rt>き</rt></ruby>いたことがあるよ。"
-},
-{
-    img:"img/dolphin.png",
-    text:"イルカ：ひとりで<ruby>探<rt>さが</rt></ruby>していたんだけど、なかなか<ruby>見<rt>み</rt></ruby>つからなくてね。"
+    text:"イルカ：<ruby>実<rt>じつ</rt></ruby>はぼくにも、どうしても<ruby>叶<rt>かな</rt></ruby>えたい<ruby>願<rt>ねが</rt></ruby>いがあるんだ。"
 },
 {
     img:"img/penguin.png",
-    text:"ペンギン：それなら、ぼくたちと<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>探<rt>さが</rt></ruby>さない？"
-},
-{
-    img:"img/otter.png",
-    text:"カワウソ：<ruby>仲間<rt>なかま</rt></ruby>が<ruby>増<rt>ふ</rt></ruby>えれば、きっと<ruby>見<rt>み</rt></ruby>つけられるよ！"
+    text:"ペンギン：どんな<ruby>願<rt>ねが</rt></ruby>いなの？"
 },
 {
     img:"img/dolphin.png",
-    text:"イルカ：<ruby>本当<rt>ほんとう</rt></ruby>かい！？ ぜひ<ruby>仲間<rt>なかま</rt></ruby>にしてほしい！"
+    text:"イルカ：この<ruby>海<rt>うみ</rt></ruby>には、<ruby>昔<rt>むかし</rt></ruby>とても<ruby>大<rt>おお</rt></ruby>きな<ruby>図書館<rt>としょかん</rt></ruby>があったんだ。"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：そこには<ruby>海<rt>うみ</rt></ruby>の<ruby>生<rt>い</rt></ruby>き<ruby>物<rt>もの</rt></ruby>たちの<ruby>歴史<rt>れきし</rt></ruby>や、<ruby>昔<rt>むかし</rt></ruby>の<ruby>知識<rt>ちしき</rt></ruby>がたくさん<ruby>残<rt>のこ</rt></ruby>されていたんだ。"
 },
 {
     img:"img/orca.png",
-    text:"シャチ：もちろんだ！"
-},
-{
-    img:"img/penguin.png",
-    text:"ペンギン：みんなで<ruby>力<rt>ちから</rt></ruby>を<ruby>合<rt>あ</rt></ruby>わせて、<ruby>町<rt>まち</rt></ruby>を<ruby>救<rt>すく</rt></ruby>おう！"
+    text:"シャチ：そんな<ruby>図書館<rt>としょかん</rt></ruby>があったのか！"
 },
 {
     img:"img/dolphin.png",
-    text:"イルカ：よーし！ <ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>見<rt>み</rt></ruby>つけるぞ！"
+    text:"イルカ：でも、<ruby>魔王<rt>まおう</rt></ruby>が<ruby>現<rt>あらわ</rt></ruby>れてから、図書館は<ruby>荒<rt>あ</rt></ruby>らされてしまった。"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：<ruby>本<rt>ほん</rt></ruby>は<ruby>散<rt>ち</rt></ruby>らばり、<ruby>建物<rt>たてもの</rt></ruby>も<ruby>壊<rt>こわ</rt></ruby>れてしまったんだ……。"
+},
+{
+    img:"img/penguin.png",
+    text:"ペンギン：それは<ruby>悲<rt>かな</rt></ruby>しいね……。"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：ぼくは、もう<ruby>一度<rt>いちど</rt></ruby>あの<ruby>図書館<rt>としょかん</rt></ruby>を<ruby>復活<rt>ふっかつ</rt></ruby>させたいんだ！"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：<ruby>失<rt>うしな</rt></ruby>われた<ruby>本<rt>ほん</rt></ruby>や<ruby>知識<rt>ちしき</rt></ruby>を<ruby>取<rt>と</rt></ruby>り<ruby>戻<rt>もど</rt></ruby>して、みんなが<ruby>学<rt>まな</rt></ruby>べる<ruby>場所<rt>ばしょ</rt></ruby>を<ruby>作<rt>つく</rt></ruby>りたい！"
+},
+{
+    img:"img/otter.png",
+    text:"カワウソ：それなら、ぼくたちも<ruby>手伝<rt>てつだ</rt></ruby>うよ！"
+},
+{
+    img:"img/penguin.png",
+    text:"ペンギン：うん！ <ruby>魔王<rt>まおう</rt></ruby>を<ruby>倒<rt>たお</rt></ruby>せば、図書館を<ruby>復活<rt>ふっかつ</rt></ruby>させることもできるかもしれない！"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：<ruby>本当<rt>ほんとう</rt></ruby>かい！？ それなら、ぼくも<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>旅<rt>たび</rt></ruby>をさせてほしい！"
+},
+{
+    img:"img/orca.png",
+    text:"シャチ：もちろんだ！ <ruby>仲間<rt>なかま</rt></ruby>が<ruby>多<rt>おお</rt></ruby>いほど<ruby>心強<rt>こころづよ</rt></ruby>い！"
+},
+{
+    img:"img/penguin.png",
+    text:"ペンギン：みんなで<ruby>力<rt>ちから</rt></ruby>を<ruby>合<rt>あ</rt></ruby>わせて、<ruby>町<rt>まち</rt></ruby>も<ruby>図書館<rt>としょかん</rt></ruby>も<ruby>救<rt>すく</rt></ruby>おう！"
+},
+{
+    img:"img/dolphin.png",
+    text:"イルカ：ありがとう！ <ruby>失<rt>うしな</rt></ruby>われた<ruby>図書館<rt>としょかん</rt></ruby>を、もう<ruby>一度<rt>いちど</rt></ruby>よみがえらせるぞ！"
 },
 {
     img:"img/dolphin.png",
@@ -491,8 +526,7 @@ guardianEvent = true;
     guardianBgm.currentTime = 0;
     guardianBgm.play();
 
-    startEvent([
-
+   startEvent([
         {
             img:"img/orca.png",
             text:"シャチ：ん？ みんな、あそこを見て！"
@@ -503,19 +537,63 @@ guardianEvent = true;
         },
         {
             img:"img/orca.png",
-            text:"シャチ：<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>にだれかいる！"
+            text:"シャチ：<ruby>神殿<rt>しんでん</rt></ruby>の<ruby>奥<rt>おく</rt></ruby>に、だれかいる！"
         },
         {
             img:"BOSS.png",
-            text:"ガーディアン：そこで止まれ。"
+            text:"ガーディアン：……よくここまで<ruby>来<rt>き</rt></ruby>たな。"
+        },
+        {
+            img:"img/penguin.png",
+            text:"ペンギン：あなたは……だれ？"
         },
         {
             img:"BOSS.png",
-            text:"私は<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>守<rt>まも</rt></ruby>るガーディアンだ。"
+            text:"ガーディアン：私は、この<ruby>神殿<rt>しんでん</rt></ruby>を<ruby>守<rt>まも</rt></ruby>るガーディアン。"
         },
         {
             img:"BOSS.png",
-            text:"<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを手にする<ruby>資格<rt>しかく</rt></ruby>があるか<ruby>試<rt>ため</rt></ruby>してやろう！"
+            text:"ガーディアン：ここには、これまで<ruby>多<rt>おお</rt></ruby>くの<ruby>挑戦者<rt>ちょうせんしゃ</rt></ruby>が<ruby>訪<rt>おとず</rt></ruby>れた。"
+        },
+        {
+            img:"img/dolphin.png",
+            text:"イルカ：<ruby>多<rt>おお</rt></ruby>くの挑戦者……？"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：ああ。<ruby>魔王<rt>まおう</rt></ruby>も、<ruby>王様<rt>おうさま</rt></ruby>も、そして<ruby>昔<rt>むかし</rt></ruby>の<ruby>勇者<rt>ゆうしゃ</rt></ruby>も、かつてここへ<ruby>来<rt>き</rt></ruby>た。"
+        },
+        {
+            img:"img/penguin.png",
+            text:"ペンギン：魔王まで……！？"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：みな、<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなの<ruby>力<rt>ちから</rt></ruby>を<ruby>求<rt>もと</rt></ruby>めていた。"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：しかし、その<ruby>力<rt>ちから</rt></ruby>を<ruby>手<rt>て</rt></ruby>にするには、<ruby>試練<rt>しれん</rt></ruby>を<ruby>乗<rt>の</rt></ruby>り<ruby>越<rt>こ</rt></ruby>なければならない。"
+        },
+        {
+            img:"img/orca.png",
+            text:"シャチ：その<ruby>試練<rt>しれん</rt></ruby>っていうのは……？"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：<ruby>力<rt>ちから</rt></ruby>だけではない。お前たちが<ruby>何<rt>なに</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>にしているのか、それを見せてもらう。"
+        },
+        {
+            img:"img/penguin.png",
+            text:"ペンギン：ぼくたちは、みんなを<ruby>救<rt>すく</rt></ruby>うためにここまで来た。"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：ならば、その<ruby>覚悟<rt>かくご</rt></ruby>を<ruby>証明<rt>しょうめい</rt></ruby>してみろ。"
+        },
+        {
+            img:"BOSS.png",
+            text:"ガーディアン：さあ、<ruby>最後<rt>さいご</rt></ruby>の<ruby>試練<rt>しれん</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>めよう！"
         }
     ]);
 }
