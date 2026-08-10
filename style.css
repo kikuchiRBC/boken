@@ -631,7 +631,23 @@ rt{
         0 0 15px rgba(255,215,0,.5);
 
     margin-bottom:20px;
-}       
+}   
+#titleScreen{
+    position:fixed;
+    inset:0;
+
+    width:100vw;
+    height:100dvh; /* スマホ対応 */
+
+    overflow:hidden;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    z-index:1000;
+}    
 #area-name{
     position:absolute;
     top:10px;
@@ -862,6 +878,7 @@ rt{
     #titleScreen{
     width:100%;
     height:100vh;
+    min-height:100dvh;
     display:flex;
     flex-direction:column;
     justify-content:center;
