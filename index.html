@@ -39,7 +39,7 @@
 
 
 <div id="titleScreen">
-    <video id="titleVideo" loop playsinline preload="none">
+    <video id="titleVideo" autoplay muted loop playsinline preload="none">
   <source src="audio/opening.mp4" type="video/mp4">
   </video>
 <select id="difficulty">
@@ -530,10 +530,11 @@ battleBgm.play();
 if(hasIceSword && freezeCount > 0){
 
 
-   document.getElementById("iceBtn").style.display =
+document.getElementById("iceBtn").style.display =
 (hasIceSword && freezeCount > 0)
 ? "block"
 : "none";
+
 document.getElementById("iceBtn").disabled =
 freezeCount <= 0;
 
@@ -571,8 +572,7 @@ document.getElementById("changeBtn").innerHTML =
 document.getElementById("changeBtn").disabled = false;
 document.getElementById("hintBtn").style.display =
 party.length >= 3 ? "block" : "none";
-document.getElementById("iceBtn").style.display =
-hasIceSword ? "block" : "none";
+
 
 document.getElementById("hintBtn").innerHTML =
 `🐬 ヒント (${hintCount})`;
@@ -2477,9 +2477,8 @@ monsterArea.classList.add("freezeCharge");
         </span>
         `;
 
-        document.getElementById("options").innerHTML =
-        `${getWinImage()}`;
-
+      document.getElementById("options").innerHTML =
+`${getWinImage()} float">`;
         battleBgm.pause();
         bossBgm.pause();
 
