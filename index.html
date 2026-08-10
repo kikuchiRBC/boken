@@ -275,7 +275,7 @@ const innBgm = document.getElementById("bgm-inn");
     const monsters3 = ["img/monst/scopion.png","img/monst/camel.png","img/monst/fenek.png","img/monst/olix.png",
                         "img/monst/pancer.png","img/monst/sanhowk.png","img/monst/rezerd.png","img/monst/sandturtle.png","img/monst/snake.png"];
     const monsters4 = ["img/monst/icerabit.png","img/monst/mogura.png","img/monst/snowbear.png","img/monst/snowcat.png","img/monst/snowfow.png"
-        ,"img/monst/snowowl.png","img/monst/snowpenguin.png","img/monst/snowshika.png","img/monst/snowwolf.png"
+        ,"img/monst/snowowl.png","img/monst/snowpenguin.png","img/monst/snowshika.png","img/monst/snowwolf.png","img/monst/snowfox.png"
     ];
      const monsters5 = ["img/monst/dragon.png","img/monst/falcon.png","img/monst/fenix.png","img/monst/gorem.png","img/monst/pison.png","img/monst/spider.png","img/monst/wolf.png"];
 
@@ -344,6 +344,7 @@ const monsterNames = {
     "img/monst/snowpenguin.png":"ひかえめペンギン",
     "img/monst/snowshika.png":"<ruby>弱気<rt>よわき</rt></ruby>シカ",
     "img/monst/snowwolf.png":"<ruby>孤独<rt>こどく</rt></ruby>ウルフ",
+    "img/monst/snowfox.png":"<ruby>嘘<rt>うそ</rt></ruby>つきギツネ",
 
     // 魔界
     "img/monst/dragon.png":"<ruby>恐怖<rt>きょうふ</rt></ruby>ドラゴン",
@@ -715,10 +716,50 @@ let endingMode = false;
     const bossImage = "BOSS.png";
 const endingScenes = [
 
-{
-    img:"img/ed1.jpg",
-    text:"ガーディアンは<ruby>静<rt>しず</rt></ruby>かにうなずいた。<br><br>『<ruby>君<rt>きみ</rt></ruby>たちは<ruby>試練<rt>しれん</rt></ruby>を<ruby>乗<rt>の</rt></ruby>り<ruby>越<rt>こ</rt></ruby>えた。』"
-},
+ {
+            img:"img/ed1.jpg",
+            text:"ガーディアン：……<ruby>見事<rt>みごと</rt></ruby>だ。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"ガーディアン：私はお前たちを<ruby>倒<rt>たお</rt></ruby>すためではなく、その<ruby>資格<rt>しかく</rt></ruby>を<ruby>試<rt>ため</rt></ruby>していた。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"<ruby>魔王<rt>まおう</rt></ruby>も<ruby>王様<rt>おうさま</rt></ruby>も、多くの者が<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなを<ruby>求<rt>もと</rt></ruby>めてここへ<ruby>来<rt>き</rt></ruby>た。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"だが、お前たちは力だけでなく<ruby>仲間<rt>なかま</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>にしてきた。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"カワウソは<ruby>病気<rt>びょうき</rt></ruby>の<ruby>家族<rt>かぞく</rt></ruby>を<ruby>助<rt>助</rt></ruby>けるために。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"シャチは美しい海を取り戻すために。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"イルカは失われた<ruby>図書館<rt>としょかん</rt></ruby>を<ruby>復活<rt>ふっかつ</rt></ruby>させるために。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"イルカ：ぼくたちの願いを知っていたの！？"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"その<ruby>願<rt>ねが</rt></ruby>いは<ruby>自分<rt>じぶん</rt></ruby>のためだけではない。だから私は<ruby>認<rt>みと</rt></ruby>めよう。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"お前たちには<ruby>伝説<rt>でんせつ</rt></ruby>のおさかなに会う<ruby>資格<rt>しかく</rt></ruby>がある。"
+        },
+        {
+            img:"img/ed1.jpg",
+            text:"ありがとう。みんな、行こう！"
+        },
 
 {
     img:"img/ed2.jpg",
