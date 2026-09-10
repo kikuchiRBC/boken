@@ -243,6 +243,12 @@ GAME START
 <script src="js/questions_n1.js"></script>
 <script src="js/questions_kids.js"></script>
     <script>
+        const video =
+document.getElementById("titleVideo");
+
+video.muted = true;
+video.defaultMuted = true;
+video.volume = 0;
         let currentLevel = "N2";
         let battleWin = false;
     let isSoundOn = true;
