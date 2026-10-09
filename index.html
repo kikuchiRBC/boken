@@ -2169,30 +2169,34 @@ monsterArea.classList.add("damageFlash");
         // ========================================
         // ゲームオーバー
         // ========================================
-        if (hp <= 0) {
+       
+if (hp <= 0) {
 
-            alert("目の前が真っ暗になった...");
+    // BGMを停止
+    bossBgm.pause();
+    bossBgm.currentTime = 0;
 
-            hp = 100;
-            exp = 0;
-            lv = 1;
+    fieldBgm.pause();
+    fieldBgm.currentTime = 0;
 
-            bossBattle = false;
-            kingBattle = false;
-            bossStreak = 0;
-            inBattle = false;
+    guardianBgm.pause();
+    guardianBgm.currentTime = 0;
 
-            bossBgm.pause();
-            bossBgm.currentTime = 0;
+    // その他の戦闘状態を解除
+    bossBattle = false;
+    inBattle = false;
+    bossStreak = 0;
 
-            audio.pause();
-            audio.currentTime = 0;
+    // フィールドや戦闘画面を隠す
+    document.getElementById("field-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "none";
 
-            returnToField();
+    // ゲームオーバー画面を表示
+    document.getElementById("gameOverScreen").style.display = "flex";
 
-            return;
-        }
-
+    // 重要：通常の問題再開処理へ進まない
+    return;
+}
 
         // ステータス更新
         updateStats();
@@ -2660,5 +2664,28 @@ if(currentMapIndex === 29){
 <img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B7X57+82JKRE+2HOM+BWGDT" alt="">
 </div>
 
+<!-- ゲームオーバー画面 -->
+<div id="gameOverScreen">
+    <div class="gameover-content">
+        <p class="gameover-title">目の前が真っ暗になった……</p>
+
+        <p class="gameover-message">
+            旅はここで終わってしまった。
+        </p>
+
+        <!-- 文字だけのアフィリエイトリンク -->
+        <p class="affiliate-link">
+            <a href="https://link.amazon/B0efK8yVy"
+               target="_blank"
+               rel="noopener noreferrer sponsored">
+                この本を買って勉強しよう！
+            </a>
+        </p>
+
+        <button onclick="location.reload()" class="top-return-btn">
+            TOPにもどる
+        </button>
+    </div>
+</div>
     </body>
     </html>

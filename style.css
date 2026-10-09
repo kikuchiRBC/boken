@@ -238,6 +238,7 @@ rt{
     animation:screenFlash .25s;
 }
 
+
 @keyframes screenFlash{
 
     0%{
@@ -1119,4 +1120,67 @@ canvas{
 
     width:32px;
     height:32px;
+}
+
+/* ゲームオーバー画面 */
+#gameOverScreen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #000;
+    color: #fff;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.gameover-content {
+    width: 100%;
+    max-width: 500px;
+}
+
+.gameover-title {
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: bold;
+    line-height: 1.8;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.gameover-message {
+    font-size: 16px;
+    color: #ccc;
+    margin-bottom: 35px;
+}
+
+.affiliate-link {
+    margin: 25px 0 40px;
+    font-size: 15px;
+}
+
+.affiliate-link a {
+    color: #aaa;
+    text-decoration: underline;
+}
+
+.affiliate-link a:hover {
+    color: #fff;
+}
+
+.top-return-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    background: #222;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.top-return-btn:hover {
+    background: #444;
 }
