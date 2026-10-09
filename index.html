@@ -533,25 +533,15 @@ battleBgm.play();
     document.getElementById("field-screen").style.display = "none";
     document.getElementById("game-container").style.display = "block";
     document.getElementById("iceBtn").style.display =
-    hasIceSword ? "block" : "none"; 
-if(hasIceSword && freezeCount > 0){
+    hasIceSword ? "block" : "none"; const iceBtn = document.getElementById("iceBtn");
 
-
-document.getElementById("iceBtn").style.display =
-(hasIceSword && freezeCount > 0)
-? "block"
-: "none";
-
-document.getElementById("iceBtn").disabled =
-freezeCount <= 0;
-
-document.getElementById("iceBtn").innerHTML =
-`❄️ FREEZE (${freezeCount})`;
-
-}else{
-
-    document.getElementById("iceBtn").style.display = "none";
-
+if (hasIceSword && freezeCount > 0) {
+    iceBtn.style.display = "block";
+    iceBtn.disabled = false;
+    iceBtn.innerHTML = `❄️ FREEZE (${freezeCount})`;
+} else {
+    iceBtn.style.display = "none";
+    iceBtn.disabled = true;
 }
  currentLevel = level;
 
@@ -2459,8 +2449,12 @@ function useFreezeStorm(){
         "#66ffff"
     );
 monsterArea.classList.add("freezeCharge");
-    // カットイン終了後
-    setTimeout(()=>{
+
+// カットイン終了後
+setTimeout(()=>{
+
+    // 揺れを止める
+    monsterArea.classList.remove("freezeCharge");
 
         const effect =
         document.getElementById("skillEffect");
@@ -2524,8 +2518,15 @@ monsterArea.classList.add("freezeCharge");
         </span>
         `;
 
-      document.getElementById("options").innerHTML =
-`${getWinImage()} float">`;
+      
+document.getElementById("options").innerHTML =
+    `
+    <img
+        src="${getWinImage()}"
+        class="win-image float"
+        alt="勝利"
+    >
+    `;
         battleBgm.pause();
         bossBgm.pause();
 
