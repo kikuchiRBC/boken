@@ -462,8 +462,6 @@ templeEvent = true;
 fieldBgm.pause();
 fieldBgm.currentTime = 0;
 
-guardianBgm.currentTime = 0;
-guardianBgm.play();
 
 fullScreenEvent = true;
 startEvent([
