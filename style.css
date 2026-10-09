@@ -1184,3 +1184,39 @@ canvas{
 .top-return-btn:hover {
     background: #444;
 }
+
+/* お店のメニューをスクロール可能にする */
+#game-container #options {
+    max-height: 55vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 10px;
+    padding-bottom: 25px;
+    gap: 10px;
+}
+
+/* お店のボタンを押しやすくする */
+#game-container #options button {
+    flex-shrink: 0;
+    min-height: 48px;
+}
+
+/* 商品画像のサイズ */
+#game-container #options .shopBtn img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+/* 最後の「おみせを出る」ボタン */
+#game-container #options button:last-child {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    background: #fff4cc;
+    color: #49320b;
+    border: 2px solid #b8860b;
+    font-weight: bold;
+}
