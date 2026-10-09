@@ -557,7 +557,7 @@ guardianEvent = true;
         },
         {
             img:"img/dolphin.png",
-            text:"イルカ：<ruby>多<rt>おお</rt></ruby>くの挑戦者……？"
+            text:"イルカ：<ruby>多<rt>おお</rt></ruby>くの<ruby>挑戦者<rt>ちょうせんしゃ</rt></ruby>……？"
         },
         {
             img:"BOSS.png",
@@ -565,7 +565,7 @@ guardianEvent = true;
         },
         {
             img:"img/penguin.png",
-            text:"ペンギン：魔王まで……！？"
+            text:"ペンギン：<ruby>魔王<rt>まおう</rt></ruby>まで……！？"
         },
         {
             img:"BOSS.png",
